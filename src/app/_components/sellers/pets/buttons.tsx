@@ -1,5 +1,6 @@
-import { PlusIcon } from "lucide-react";
+import { PencilIcon, PlusIcon, TrashIcon } from "lucide-react";
 import Link from "next/link";
+import { deletePet } from "~/lib/action";
 
 export function AddPet() {
   return (
@@ -11,4 +12,25 @@ export function AddPet() {
       <PlusIcon className="h-5 md:ml-4" />
     </Link>
   );
+}
+export function EditPet({ id }: { id: number }) {
+  return (
+    <Link
+      href={`/sellers/pets/${id}/edit`}
+      className="rounded-md border p-2 hover:bg-gray-100"
+    >
+      <PencilIcon className="w-5" />
+    </Link>
+  );
+}
+
+export function DeletePet({id,image_url,thumb_url}:{id:number,image_url:string,thumb_url:string}){
+  return (
+    <form action={deletePet.bind(null,id,image_url,thumb_url)}>
+      <button className="rounded-md border p-2 hover:bg-gray-100">
+        <span className="sr-only">Delete</span>
+        <TrashIcon className="w-5" />
+      </button>
+    </form>
+  )
 }

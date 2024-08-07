@@ -26,7 +26,7 @@ export default function(){
         toast({description: "Login Successfully.",})
       
         setTimeout(()=>{
-            router.replace('/');
+            router.replace('/sellers');
         },1000)
     } 
   }

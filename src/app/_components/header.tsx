@@ -76,6 +76,13 @@ function BannerInput({label,name}:{label:string,name:string}):JSX.Element{
       peer-[:not(:placeholder-shown)]:translate-x-0.5
       peer-[:not(:placeholder-shown)]:-translate-y-1.5
       peer-[:not(:placeholder-shown)]:text-gray-500">{name}</label>
+      <datalist id={label}>
+          <option value="Black" />
+          <option value="Red" />
+          <option value="Green" />
+          <option value="Blue" />
+          <option value="White" />
+      </datalist>
   </div>
   )
 }

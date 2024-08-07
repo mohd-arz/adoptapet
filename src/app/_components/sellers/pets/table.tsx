@@ -1,7 +1,19 @@
 import Image from "next/image";
+import { getServerAuthSession } from "~/lib/auth";
+import { db } from "~/server/db";
+import { DeletePet, EditPet } from "./buttons";
+import { PetType } from "@prisma/client";
+import { api } from "~/trpc/server";
 
-export default function(){
-  const pets = [];
+const ITEMS_PER_PAGE = 10;
+
+
+export default async function({query,currentPage}:{query:string,currentPage:number}){
+  const session = await getServerAuthSession();
+  if(!session)return;
+  const id =  (session?.user as { id?: number })?.id as number; 
+  const pets = await api.pet.getPets({id,query, currentPage});
+  const BASE_URL = process.env.NEXT_BASE_URL;
     return (
         <div className="mt-6 flow-root">
           <div className="inline-block min-w-full align-middle">
@@ -15,8 +27,8 @@ export default function(){
                     <div className="flex items-center justify-between border-b pb-4">
                       <div>
                         <div className="mb-2 flex items-center">
-                          <Image 
-                            src={pet.image_url}
+                          <img 
+                            src={`${BASE_URL}/${pet.thumb_url}`}
                             className="mr-2 rounded-full"
                             width={28}
                             height={28}
@@ -30,10 +42,10 @@ export default function(){
                     </div>
                     <div className="flex w-full items-center justify-between pt-4">
                       <div>
-                        <p>{(pet.createdAt)}</p>
+                        <p>{new Date(pet.createdAt).toLocaleDateString()}</p>
                       </div>
                       <div className="flex justify-end gap-2">
-                        {/* <UpdateInvoice id={invoice.id} /> */}
+                        <EditPet id={pet.id} />
                         {/* <DeleteInvoice id={invoice.id} /> */}
                       </div>
                     </div>
@@ -72,7 +84,7 @@ export default function(){
                       <td className="whitespace-nowrap py-3 pl-6 pr-3">
                         <div className="flex items-center gap-3">
                           <Image
-                            src={pet.image_url}
+                            src={`${BASE_URL}/${pet.thumb_url}`}
                             className="rounded-full"
                             width={28}
                             height={28}
@@ -85,15 +97,15 @@ export default function(){
                         {pet.type}
                       </td>
                       <td className="whitespace-nowrap px-3 py-3">
-                        {(pet.createdAt)}
+                        {pet.status == true ? 'Active' : "Inactive"}
                       </td>
                       <td className="whitespace-nowrap px-3 py-3">
-                        {pet.status}
+                      {new Date(pet.createdAt).toLocaleDateString()}
                       </td>
-                      <td className="whitespace-nowrap py-3 pl-6 pr-3">
-                        <div className="flex justify-end gap-3">
-                          {/* <UpdateInvoice id={invoice.id} />
-                          <DeleteInvoice id={invoice.id} /> */}
+                      <td className="whitespace-nowrap py-3 pl-0 pr-3">
+                        <div className="flex gap-3">
+                          <EditPet id={pet.id} />
+                          <DeletePet id={pet.id} image_url={pet.image_url} thumb_url={pet.thumb_url as string}/>
                         </div>
                       </td>
                     </tr>

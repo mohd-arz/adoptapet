@@ -1,10 +1,7 @@
 import {z} from 'zod';
 import { createTRPCRouter, publicProcedure } from "~/server/api/trpc";
 import bcrypt from 'bcrypt';
-import cookie from 'cookie';
-import jwt from 'jsonwebtoken';
 import { Prisma } from '@prisma/client';
-const {JWT_SECRET} = process.env;
 
 const authRouter = createTRPCRouter({
   signin: publicProcedure
@@ -23,7 +20,6 @@ const authRouter = createTRPCRouter({
   })
     if(!user)return {error:'No User Found',user:null}
     if(user && await bcrypt.compare(input.password,user.password)){
-      // const token = jwt.sign({user:user.id},JWT_SECRET as string);
       return {user}
     }else{
       return {error:'Wrong Credentials',user:null}
@@ -49,17 +45,6 @@ const authRouter = createTRPCRouter({
           type
         }
       });
-      // const token = jwt.sign({user:newUser.id},JWT_SECRET as string);
-      
-      // ctx.res.headers.set(
-      //   'Set-Cookie',
-      //   cookie.serialize('token', token, {
-      //     httpOnly: true,
-      //     secure: process.env.NODE_ENV === 'production',
-      //     maxAge: 3600,
-      //     path: '/',
-      //   })
-      // );
       return {user:newUser}
     }catch(error){
       if (error instanceof Prisma.PrismaClientKnownRequestError) {

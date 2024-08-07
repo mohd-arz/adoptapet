@@ -1,8 +1,12 @@
+import { redirect } from "next/navigation"
 import { Suspense } from "react"
 import { AddPet } from "~/app/_components/sellers/pets/buttons"
+import Pagination from "~/app/_components/sellers/pets/pagination"
 import Search from "~/app/_components/sellers/pets/search"
 import Table from "~/app/_components/sellers/pets/table"
 import { lusitana } from "~/app/_components/utils/font"
+import { getServerAuthSession } from "~/lib/auth"
+import { api } from "~/trpc/server"
 
 export default async function({
   searchParams
@@ -12,9 +16,14 @@ export default async function({
     page?:string
   }
 }){
+  const session = await getServerAuthSession();
+  console.log(session)
+  if(!session)redirect('/signin/')
+
   const query = searchParams?.query || ''
   const currentPage = Number(searchParams?.page) || 1;
-  // const totalPages =  await fetchInvoicesPages(query);
+  const {totalPages} =  await api.pet.getPetTablePages({query});
+  console.log('totalPages',totalPages);
   return (
     <div className="w-full">
       <div className="flex w-full items-center justify-between">
@@ -25,11 +34,11 @@ export default async function({
         <AddPet />
       </div>
        {/* <Suspense key={query + currentPage} fallback={<InvoicesTableSkeleton />}> */}
-        <Table />
+        <Table query={query} currentPage={currentPage}/>
       {/* </Suspense> */}
-      <div className="mt-5 flex w-full justify-center">
-        {/* <Pagination totalPages={totalPages} /> */}
-      </div>
+        <div className="mt-5 flex w-full justify-end">
+          <Pagination totalPages={totalPages?totalPages : 1} />
+        </div>
     </div>
   )
 }

@@ -9,7 +9,7 @@
 import { TRPCError, initTRPC } from "@trpc/server";
 import superjson from "superjson";
 import { ZodError } from "zod";
-import { authOptions, getServerAuthSession } from "~/lib/auth";
+import {  getServerAuthSession } from "~/lib/auth";
 
 import { db } from "~/server/db";
 
@@ -27,7 +27,6 @@ import { db } from "~/server/db";
  */
 export const createTRPCContext = async (opts: { headers: Headers }) => {
   const session = await getServerAuthSession();
-  console.log('trcpc ',session);
   return {
     db,
     session,

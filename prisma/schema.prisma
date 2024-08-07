@@ -33,9 +33,11 @@ model Pet {
   pet_id    String    @default(uuid())
   name      String
   image_url String
+  thumb_url String?
   sex       PetSex?
   age       PetAge?
   type      PetType
+  other     String?
   breed_id  Int?
   breed     Breed?     @relation(fields: [breed_id],references: [id])
   status    Boolean   @default(true)

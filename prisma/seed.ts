@@ -1,11 +1,6 @@
+import { PetType } from "@prisma/client";
 import { db } from "~/server/db"
 
-
-enum PetType {
-  DOG = 'DOG',
-  CAT = 'CAT',
-  OTHERS = 'OTHERS',
-}
 
 type DogBreedType = {
   name: string;

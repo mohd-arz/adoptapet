@@ -1,11 +1,11 @@
-"use client"
 import Link from "next/link";
 import Button from "../../_components/button";
 import { Header } from "../../_components/header";
 import { SwiperContainer } from "../../_components/swiper";
+import { api } from "~/trpc/server";
 
-
-export default function(){
+export default async function(){
+  const newPets = await api.pet.getNewPets();
   return (
     <div className="">
       <Header/>
@@ -19,7 +19,7 @@ export default function(){
           <div className="text-xl mb-5">
             We're spotlighting a few pets looking for homes.
           </div>
-          <SwiperContainer/>
+          <SwiperContainer pets={newPets}/>
         </section>
         <div className="wrapper bg-cyan">
           <section className="px-[5%] mx-auto border text-center border-red-500 max-w-[1400px] w-full flex gap-14 ">

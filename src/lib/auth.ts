@@ -1,6 +1,8 @@
-import { NextAuthOptions, Session, getServerSession } from "next-auth";
+import { NextAuthOptions, getServerSession } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials"
-import { api } from "~/trpc/server"
+import bcrypt from 'bcrypt';
+import { db } from "~/server/db";
+import { Prisma } from "@prisma/client";
 export const authOptions:NextAuthOptions = {
   // Configure one or more authentication providers
   providers: [
@@ -14,16 +16,27 @@ export const authOptions:NextAuthOptions = {
       async authorize(credentials, req) {
         const email = credentials?.email as string;
         const password = credentials?.password as string;
-        const res = await api.auth.signin({
-          email,
-          password,
-        })
-        if(res.user)
-        return {
-          id:res.user.id.toString(),
-          email:res.user.email,
-        };
-        throw new Error(res.error);
+      
+        const user = await db.user.findUnique({
+          where:{
+            email:email
+          },select:{
+            id:true,
+            name:true,
+            email:true,
+            password:true
+          }
+      })
+  
+      if (!user) {
+        // Handle the error appropriately, e.g., throw an error
+        throw new Error('No User Found');
+    }
+        if(user && await bcrypt.compare(password,user.password)){
+          return user
+        }else{
+          throw new Error('Wrong Credentials');
+        } 
       },
     }),
     CredentialsProvider({
@@ -34,22 +47,33 @@ export const authOptions:NextAuthOptions = {
         email:{label:'Email',type:'text',placeholder:'Email'},
         password:{label:'Password',type:'password',placeholder:'********'}
       },
-      async authorize(credentials, req) {
+      async authorize(credentials) {
         const name = credentials?.name as string;
         const email = credentials?.email as string;
         const password = credentials?.password as string;
-        const res = await api.auth.signup({
-          name,
-          email,
-          password,
-          type:"seller",
-        })
-        if(res.user)
-          return {
-            id:res.user.id.toString(),
-            email:res.user.email,
-          };
-        throw new Error(res.error);
+        const hashedPass =  await bcrypt.hash(password,10);
+        try{
+          const user = await db.user.create({
+            data:{
+              name,
+              email,
+              password:hashedPass,
+              type:"seller",
+            }
+          });
+          return user
+        }catch(error){
+          if (error instanceof Prisma.PrismaClientKnownRequestError) {
+            if (error.code === 'P2002') {
+              throw new Error('Unique constraint failed on the field: ' + error.meta?.target);
+            }
+            throw new Error('Known Request Error: ' + error.message);
+          } else if (error instanceof Prisma.PrismaClientUnknownRequestError) {
+            throw new Error('Unknown Request Error: ' + error.message);
+          } else {
+            throw new Error('Other Error: ' + error);
+          }
+        }
       },
     }),
   ],
@@ -70,7 +94,7 @@ export const authOptions:NextAuthOptions = {
     },
     session: ({ session, token, user }: any) => {
         if (session.user) {
-            session.user.userId = token.uid
+            session.user.id = token.uid
         }
         return session
     }
