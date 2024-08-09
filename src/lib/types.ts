@@ -9,6 +9,7 @@ export const petDefaultValues = {
   other: undefined,
   age:undefined,
   breed:undefined,
+  location:undefined,
 }
 
 const MAX_FILE_SIZE = 3 * 1024 * 1024; 
@@ -21,6 +22,7 @@ export const petFormSchema = z.object({
   type: z.enum([PetType.DOG,PetType.CAT,PetType.OTHERS],{message:"Type is required"}),
   other:z.string().optional(),
   breed: z.string().optional(),
+  location:z.string({message:'Location is required'}),
 }).refine(data => {
   if (data.type === PetType.OTHERS) {
     return data.other && data.other.trim() !== '';
@@ -42,4 +44,9 @@ export const petFormSchema = z.object({
 export type breedType = {
   id:number,
   name:string,
+}
+
+export type locationType = {
+  id:number
+  name:string
 }

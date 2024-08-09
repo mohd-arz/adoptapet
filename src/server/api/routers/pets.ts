@@ -38,7 +38,7 @@ function conditions(query:string){
 }
 
 export const petRouter = createTRPCRouter({
-  getBreed:protectedProcedure
+  getBreed:publicProcedure
   .input(z.object({ type: z.enum([PetType.DOG,PetType.CAT,PetType.OTHERS]) }))
   .query(async({input})=>{
     const breeds = await db.breed.findMany({
@@ -51,6 +51,19 @@ export const petRouter = createTRPCRouter({
     })
     return { breeds }
   }),//By Id
+  getLocation:publicProcedure.query(async()=>{
+    try{
+      const locations = await db.location.findMany({     
+        select:{
+          id:true,
+          name:true,
+        },
+      });
+      return {locations}
+    }catch(error){
+      console.log(error);
+    }
+  }),
   getPet:protectedProcedure
   .input(z.object({id:z.string()}))
   .query(async({input})=>{
@@ -101,6 +114,7 @@ export const petRouter = createTRPCRouter({
         name:true,
         type:true,
         breed:true,
+        location:true,
         image_url:true,
         createdAt:true,
       },

@@ -3,7 +3,7 @@
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import { number, z } from "zod"
-import { breedType, petDefaultValues } from "~/lib/types"
+import { breedType, locationType, petDefaultValues } from "~/lib/types"
 import { inferRouterOutputs } from '@trpc/server';
 import { AppRouter } from "~/server/api/root";
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "~/components/ui/form"
@@ -47,6 +47,7 @@ export const petFormSchema = z.object({
   type: z.enum([PetType.DOG,PetType.CAT,PetType.OTHERS],{message:"Type is required"}),
   other:z.string().optional(),
   breed: z.string().optional(),
+  location: z.string({message:"Location is required"})
 }).refine(data => {
   if (data.type === PetType.OTHERS) {
     return data.other && data.other.trim() !== '';
@@ -76,6 +77,7 @@ export default function FormComponent({pet}:{pet:petType}):JSX.Element{
   )
   const BASE_URL = "http://localhost:3000";
   const [breeds,setBreeds ] = useState<breedType[]>([]);
+  const [locations,setLocations] = useState<locationType[]>([]);
   const router = useRouter()
   const formState = useForm<formType>({
     resolver:zodResolver(petFormSchema),
@@ -87,6 +89,7 @@ export default function FormComponent({pet}:{pet:petType}):JSX.Element{
       age:pet.age ? pet.age : undefined,
       other:pet.other ? pet.other : undefined,
       breed:pet.breed_id ? pet.breed_id.toString() : undefined,
+      location:pet.location_id ? pet.location_id.toString() : undefined,
     },
   })
 
@@ -98,12 +101,17 @@ export default function FormComponent({pet}:{pet:petType}):JSX.Element{
         enabled: !!typeValue && typeValue === PetType.DOG,
       }
     );
+    const locationQuery = api.pet.getLocation.useQuery();
 
   useEffect(() => {
     if (isSuccess && data) {
       setBreeds(data.breeds);
     }
-  }, [isSuccess, data]);
+    if(locationQuery.isSuccess && locationQuery.data){
+      setLocations(locationQuery.data.locations)
+    }
+    
+  }, [isSuccess, data,locationQuery.isSuccess,locationQuery.data]);
 
 
   if (isError) {
@@ -155,7 +163,6 @@ export default function FormComponent({pet}:{pet:petType}):JSX.Element{
       })
     }
     })
-    console.log('hello')
   }
   return (
     <>
@@ -326,6 +333,31 @@ export default function FormComponent({pet}:{pet:petType}):JSX.Element{
                   />
                 )
               }
+                {/* Location */}
+                <FormField
+                  control={formState.control}
+                  name="location"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Location</FormLabel>
+                      <Select onValueChange={field.onChange} defaultValue={pet.location_id ? pet.location_id.toString() : undefined}>
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder={locationQuery.isLoading ? 'Location are loading':'Select a Location'} />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          {locationQuery.isSuccess && locations.map(location=>{
+                            return (
+                              <SelectItem key={location.id} value={(location.id).toString()}>{location.name}</SelectItem>
+                            )
+                          })}
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
           <Button type="submit">Submit</Button>
         </form>
       </Form>

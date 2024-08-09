@@ -23,7 +23,7 @@ import {  storePet } from "~/lib/action"
 import { ToastAction } from "~/components/ui/toast"
 import { useRouter } from "next/navigation"
 import { z } from "zod"
-import { petFormSchema, petDefaultValues, breedType } from "~/lib/types"
+import { petFormSchema, petDefaultValues, breedType, locationType } from "~/lib/types"
 
 // //Create Form Schema
 export type formType = z.infer<typeof petFormSchema>
@@ -41,6 +41,7 @@ const OTHERS = [
 export default function FormComponent():JSX.Element{
   const [isPending, startTransition] = useTransition();
   const [breeds,setBreeds ] = useState<breedType[]>([]);
+  const [locations,setLocations] = useState<locationType[]>([]);
   const router = useRouter();
   const formState = useForm<formType>({
     resolver:zodResolver(petFormSchema),
@@ -49,7 +50,6 @@ export default function FormComponent():JSX.Element{
   const typeValue = formState.watch('type');
 
   async function onSubmit(values: z.infer<typeof petFormSchema>) {
-
     const form = new FormData();
     for (const [key, value] of Object.entries(values)) {
       form.append(key, value);
@@ -99,16 +99,23 @@ export default function FormComponent():JSX.Element{
     }
   );
 
+  const locationQuery = api.pet.getLocation.useQuery();
+
   useEffect(() => {
     if (isSuccess && data) {
       setBreeds(data.breeds);
     }
-  }, [isSuccess, data]);
+    if(locationQuery.isSuccess && locationQuery.data){
+      setLocations(locationQuery.data.locations)
+    }
+    
+  }, [isSuccess, data,locationQuery.isSuccess,locationQuery.data]);
 
 
   if (isError) {
     toast({description:error.message})
   }
+
 
 
   return (
@@ -269,6 +276,31 @@ export default function FormComponent():JSX.Element{
                 />
               )
             }
+            {/* Location */}
+                <FormField
+                  control={formState.control}
+                  name="location"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Location</FormLabel>
+                      <Select onValueChange={field.onChange}>
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder={locationQuery.isLoading ? 'Location are loading':'Select a Location'} />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          {locationQuery.isSuccess && locations.map(location=>{
+                            return (
+                              <SelectItem key={location.id} value={(location.id).toString()}>{location.name}</SelectItem>
+                            )
+                          })}
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
       <Button type="submit" disabled={isPending}>Submit</Button>
     </form>
   </Form>

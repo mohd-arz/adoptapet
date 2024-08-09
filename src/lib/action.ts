@@ -21,6 +21,7 @@ export async function storePet(formData:FormData){
     type:formData.get('type') as PetType,
     sex: formData.get('sex') as PetSex,
     age: formData.get('age') as PetAge,
+    location:formData.get('location') as string,
   }
   const id =  (session?.user as { id?: number })?.id as number; 
   if(formData.get('other'))
@@ -55,6 +56,7 @@ export async function storePet(formData:FormData){
         thumb_url:relativePathT,
         type:form.type,
         sex:form.sex,
+        location_id:+form.location,
         other:form.other,
         breed_id:breedId,
         createdBy:id,
@@ -119,6 +121,7 @@ export async function updatePet(stringify:string,form:FormData,{id,image_url,thu
         type:values.type,
         sex:values.sex,
         other:values.other,
+        location_id: +values.location,
         breed_id:values.breed ? +values.breed : undefined,
       }
     })

@@ -1,7 +1,7 @@
 import Link from "next/link";
-import Button from "../../_components/button";
-import { Header } from "../../_components/header";
-import { SwiperContainer } from "../../_components/swiper";
+import Button from "../../_components/home/button";
+import { Header } from "../../_components/home/header";
+import { SwiperContainer } from "../../_components/home/swiper";
 import { api } from "~/trpc/server";
 
 export default async function(){

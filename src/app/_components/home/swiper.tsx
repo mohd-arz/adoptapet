@@ -7,27 +7,25 @@ import { FaCircleChevronLeft, FaCircleChevronRight } from "react-icons/fa6";
 import { inferRouterOutputs } from '@trpc/server';
 import { AppRouter } from '~/server/api/root';
 import Image from 'next/image';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
 export type petType= inferRouterOutputs<AppRouter>['pet']['getNewPets'];
 
 
 export function SwiperContainer({pets}:{pets:petType}):JSX.Element{
-  console.log(pets);
   const swiper = useSwiper();
   const swiperRef = useRef<SwiperRef>(null);
   const handlePrev = () => {
     if (swiperRef.current) {
       const swiper = swiperRef.current.swiper;
-      // Move 3 slides back
-      for (let i = 0; i < 3; i++) {
-        swiper.slidePrev();
-      }
+      const newIndex = Math.max(swiper.activeIndex - 3, 0);
+      swiper.slideTo(newIndex);
     }
   };
 
   const handleNext = () => {
     if (swiperRef.current) {
       const swiper = swiperRef.current.swiper;
-      const newIndex = Math.min(swiper.activeIndex + 3, swiper.slides.length - 1); // Ensure index does not exceed the number of slides
+      const newIndex = Math.min(swiper.activeIndex + 3, swiper.slides.length - 1);
       swiper.slideTo(newIndex);
     }
   };
@@ -45,8 +43,8 @@ export function SwiperContainer({pets}:{pets:petType}):JSX.Element{
           <SwiperSlide key={index}><SlideElement pet={pet}/></SwiperSlide>
         ))}
       </Swiper>
-      <FaCircleChevronLeft
-        className="prev-arrow absolute left-0 top-2/4 cursor-pointer"
+      <ChevronLeft
+        className="prev-arrow absolute left-0 top-2/4 cursor-pointer border border-black bg-slate-200 rounded-lg"
         onClick={handlePrev}
         style={{
           color: "lightgray",
@@ -55,8 +53,8 @@ export function SwiperContainer({pets}:{pets:petType}):JSX.Element{
           fontSize: "20px",
         }}
       />
-      <FaCircleChevronRight
-        className="next-arrow absolute right-0 top-2/4 cursor-pointer"
+      <ChevronRight
+        className="next-arrow absolute right-0 top-2/4 cursor-pointer border border-black bg-slate-200 rounded-lg"
         onClick={handleNext}
         style={{
           color: "lightgray",
@@ -79,7 +77,6 @@ function SlideElement({pet}:{pet:any}):JSX.Element{
       WebkitMaskSize:'85%',    
       maskPosition:"center",
     }
-  console.log(pet);
   const BASE_URL = "http://localhost:3000"
   return (
     <div style={{ maxWidth:'350px' }} className="flex flex-col w-full max-h-500 bg-cyan rounded-2xl">
@@ -87,7 +84,7 @@ function SlideElement({pet}:{pet:any}):JSX.Element{
           {/* <img src="https://pet-uploads.adoptapet.com/1/b/b/1138469363.jpg" className="w-full" style={{objectFit:'cover'}} alt="Dog Image"/> */}
            <img
               src={`${BASE_URL}/${pet.image_url}`}
-              style={{objectFit:'cover',aspectRatio:'1/1'}} alt="Dog Image"
+              style={{objectFit:'cover',aspectRatio:'1/1'}}
               width={'350'}
               alt={`${pet.name}'s profile pictures`}
             />
@@ -108,7 +105,8 @@ function SlideElement({pet}:{pet:any}):JSX.Element{
           )
         }
         <div>
-          <p className="text-lg font-light">Age:{pet.age}</p>
+          <p className="text-lg font-light">{pet.age}</p>
+          <p className="text-lg font-light">{pet.location ? pet.location.name : 'Location'}</p>
         </div>
       </div>
     </div>

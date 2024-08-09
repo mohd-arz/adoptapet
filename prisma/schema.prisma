@@ -38,6 +38,8 @@ model Pet {
   age       PetAge?
   type      PetType
   other     String?
+  location_id Int
+  location  Location @relation(fields: [location_id],references: [id])
   breed_id  Int?
   breed     Breed?     @relation(fields: [breed_id],references: [id])
   status    Boolean   @default(true)
@@ -45,6 +47,12 @@ model Pet {
   seller    User      @relation(fields: [createdBy],references: [id])
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
+}
+
+model Location {
+  id Int @id @default(autoincrement())
+  name String 
+  pet Pet[]
 }
 
 enum PetType {
