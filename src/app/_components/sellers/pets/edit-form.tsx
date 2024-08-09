@@ -87,7 +87,7 @@ export default function FormComponent({pet}:{pet:petType}):JSX.Element{
       sex:pet.sex ? pet.sex : undefined,
       type:pet.type,
       age:pet.age ? pet.age : undefined,
-      other:pet.other ? pet.other : undefined,
+      other:pet.other ? pet.other : '',
       breed:pet.breed_id ? pet.breed_id.toString() : undefined,
       location:pet.location_id ? pet.location_id.toString() : undefined,
     },

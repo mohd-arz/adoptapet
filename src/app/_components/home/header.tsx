@@ -7,6 +7,8 @@ import { AgeInput, BreedInput, LocationInput } from "./banner-select";
 import { PetAge, PetType } from "@prisma/client";
 import { api } from "~/trpc/react";
 import { breedType, locationType } from "~/lib/types";
+import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
+import { type as typeState } from "~/lib/atom";
 
 export function Header(){
   return(
@@ -49,11 +51,14 @@ type ageType = {
 function Banner():JSX.Element{
   const [location,setLocation] = useState<locationType>({id:0,name:'default'});
   const [age,setAge] = useState<PetAge[]>([]);
-  const [breeds,setBreeds] = useState<breedType[]>();
+  const [breeds,setBreeds] = useState<breedType[]>([]);
   const [breed,setBreed] = useState<breedType[]>([]); 
   const [locations,setLocations] = useState<locationType[]>([]);
-  console.log(location,age,breed);
-  
+  const [type,setType] = useRecoilState(typeState);
+
+  const handleTypeChange = (newType:PetType) => {
+    setType(newType);
+  };  
   const { data, isSuccess }  = api.pet.getBreed.useQuery({type:PetType.DOG})
   const locationQuery = api.pet.getLocation.useQuery();
 
@@ -76,18 +81,23 @@ function Banner():JSX.Element{
           <div className="banner-description text-white">Let's get started. Search pets from shelters, rescues, and individuals.</div>
           <div className="banner-search h-[152px] flex flex-col justify-between bg-cyan rounded-tl-xl rounded-tr-xl p-5">
               <ul className="flex text-xl gap-4">
-                <li>Dog</li>
-                <li>Cat</li>
-                <li>Other Pets</li>
+                <li className={`cursor-pointer ${type === PetType.DOG ? 'font-bold' : ''}`}
+                onClick={() => handleTypeChange(PetType.DOG)}>
+                  Dog
+                </li>
+                <li className={`cursor-pointer ${type === PetType.CAT ? 'font-bold' : ''}`} 
+                  onClick={() => handleTypeChange(PetType.CAT)}>
+                    Cat
+                  </li>
+                <li className={`cursor-pointer ${type === PetType.OTHERS ? 'font-bold' : ''}`} 
+                  onClick={() => handleTypeChange(PetType.OTHERS)}>
+                  Other Pets
+                </li>
               </ul>
             <div className="flex justify-center items-center gap-4">
               <LocationInput locations={locations} setLocation={setLocation}></LocationInput>
               <AgeInput ages={ages} age={age} setAge={setAge}/>
-              {
-                breeds ? (
-                  <BreedInput breed={breed} breeds={breeds as breedType[]} setBreed={setBreed}/>
-                ):'Loading...'
-              }
+              <BreedInput breed={breed} breeds={breeds as breedType[]} setBreed={setBreed}/>
               <GetStartedButton/>
             </div>
           </div>

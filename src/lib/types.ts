@@ -6,7 +6,7 @@ export const petDefaultValues = {
   image_url:undefined,
   sex:undefined,
   type:undefined,
-  other: undefined,
+  other: '',
   age:undefined,
   breed:undefined,
   location:undefined,

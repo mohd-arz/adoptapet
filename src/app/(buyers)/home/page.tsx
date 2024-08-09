@@ -5,7 +5,6 @@ import { SwiperContainer } from "../../_components/home/swiper";
 import { api } from "~/trpc/server";
 
 export default async function(){
-  const newPets = await api.pet.getNewPets();
   return (
     <div className="">
       <Header/>
@@ -19,7 +18,7 @@ export default async function(){
           <div className="text-xl mb-5">
             We're spotlighting a few pets looking for homes.
           </div>
-          <SwiperContainer pets={newPets}/>
+          <SwiperContainer/>
         </section>
         <div className="wrapper bg-cyan">
           <section className="px-[5%] mx-auto border text-center border-red-500 max-w-[1400px] w-full flex gap-14 ">

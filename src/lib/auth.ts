@@ -3,6 +3,11 @@ import CredentialsProvider from "next-auth/providers/credentials"
 import bcrypt from 'bcrypt';
 import { db } from "~/server/db";
 import { Prisma } from "@prisma/client";
+interface User {
+  id: string;
+  name: string;
+  email: string;
+}
 export const authOptions:NextAuthOptions = {
   // Configure one or more authentication providers
   providers: [
@@ -33,7 +38,11 @@ export const authOptions:NextAuthOptions = {
         throw new Error('No User Found');
     }
         if(user && await bcrypt.compare(password,user.password)){
-          return user
+          return {
+            id: user.id.toString(), // Convert id to string
+            name: user.name,
+            email: user.email,
+        } as User;
         }else{
           throw new Error('Wrong Credentials');
         } 
@@ -61,7 +70,11 @@ export const authOptions:NextAuthOptions = {
               type:"seller",
             }
           });
-          return user
+          return {
+            id: user.id.toString(), // Convert id to string
+            name: user.name,
+            email: user.email,
+        } as User;
         }catch(error){
           if (error instanceof Prisma.PrismaClientKnownRequestError) {
             if (error.code === 'P2002') {

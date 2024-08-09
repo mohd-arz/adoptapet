@@ -12,7 +12,7 @@ export default async function({query,currentPage}:{query:string,currentPage:numb
   const session = await getServerAuthSession();
   if(!session)return;
   const id =  (session?.user as { id?: number })?.id as number; 
-  const pets = await api.pet.getPets({id,query, currentPage});
+  const pets = await api.pet.getPets({id:+id,query, currentPage});
   const BASE_URL = process.env.NEXT_BASE_URL;
     return (
         <div className="mt-6 flow-root">

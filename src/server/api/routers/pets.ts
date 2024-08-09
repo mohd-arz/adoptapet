@@ -71,13 +71,14 @@ export const petRouter = createTRPCRouter({
     return {pet};
   }),//Count for Pet Table
   getPetTablePages:protectedProcedure
-  .input(z.object({query:z.string()}))
+  .input(z.object({id:z.number(),query:z.string()}))
   .query(async({input})=>{
     try{
       const {query} = input;
       const count = await  db.pet.count({
         where:{
-          OR: conditions(query)
+          OR: conditions(query),
+          createdBy:input.id,
         }
       })
       const totalPages = Math.ceil(Number(count) / ITEMS_PER_PAGE);
@@ -104,8 +105,12 @@ export const petRouter = createTRPCRouter({
     })
   }),
   getNewPets:publicProcedure
-  .query(async()=>{
+  .input(z.object({type:z.enum([PetType.DOG,PetType.CAT,PetType.OTHERS])}))
+  .query(async({input})=>{
     return await db.pet.findMany({
+      where:{
+        type:input.type
+      },
       take:9,
       select:{
         id:true,
@@ -114,6 +119,7 @@ export const petRouter = createTRPCRouter({
         name:true,
         type:true,
         breed:true,
+        other:true,
         location:true,
         image_url:true,
         createdAt:true,

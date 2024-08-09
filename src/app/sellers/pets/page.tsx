@@ -19,11 +19,10 @@ export default async function({
   const session = await getServerAuthSession();
   console.log(session)
   if(!session)redirect('/signin/')
-
+  const id =  (session?.user as { id?: number })?.id as number; 
   const query = searchParams?.query || ''
   const currentPage = Number(searchParams?.page) || 1;
-  const {totalPages} =  await api.pet.getPetTablePages({query});
-  console.log('totalPages',totalPages);
+  const {totalPages} =  await api.pet.getPetTablePages({id:+id,query});
   return (
     <div className="w-full">
       <div className="flex w-full items-center justify-between">

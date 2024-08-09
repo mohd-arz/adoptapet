@@ -49,13 +49,13 @@ const authRouter = createTRPCRouter({
     }catch(error){
       if (error instanceof Prisma.PrismaClientKnownRequestError) {
         if (error.code === 'P2002') {
-          return {error:('Unique constraint failed on the field:'+ error.meta?.target)};
+          return {error:('Unique constraint failed on the field:'+ error.meta?.target as string)};
         }
         return {error:('Known Request Error:'+ error.message)};
       } else if (error instanceof Prisma.PrismaClientUnknownRequestError) {
         return {error:('Unknown Request Error:'+ error.message)};
       } else {
-        return {error:('Other Error:'+ error)};
+        return {error:('Other Error:'+ error as string)};
       }
     }
   })

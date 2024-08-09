@@ -59,7 +59,7 @@ export async function storePet(formData:FormData){
         location_id:+form.location,
         other:form.other,
         breed_id:breedId,
-        createdBy:id,
+        createdBy:+id,
       }
     })
     return {message:"Added Successfully",status:true}

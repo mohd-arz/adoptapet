@@ -1,18 +1,18 @@
 "use client"
-import {  useState } from "react"
+import {  FormEvent, useState } from "react"
 import { signIn } from 'next-auth/react';
 import { useRouter } from "next/navigation";
 import { Toaster } from "~/components/ui/toaster";
 import { useToast } from "~/components/ui/use-toast";
 
-export default function(){
+export default function SignIn(){
   const [email,setEmail] = useState('');
   const [password,setPassword] = useState('');
   const [error, setError] = useState('');
   const router = useRouter();
   const { toast } = useToast()
   
-  async function handleSubmit(e:any){
+  async function handleSubmit(e:FormEvent<HTMLFormElement>){
       e.preventDefault();
         const res:any = await signIn('login',{
         email,
@@ -35,7 +35,7 @@ export default function(){
       <div className="flex flex-col items-center justify-center px-6 py-8 mx-auto md:h-screen lg:py-0">
           <a href="#" className="flex items-center mb-6 text-2xl font-semibold text-gray-900 dark:text-white">
               <img className="w-8 h-8 mr-2" src="https://flowbite.s3.amazonaws.com/blocks/marketing-ui/logo.svg" alt="logo"/>
-              Flowbite    
+              Best Friend    
           </a>
           <div className="w-full bg-white rounded-lg shadow dark:border md:mt-0 sm:max-w-md xl:p-0 dark:bg-gray-800 dark:border-gray-700">
               <div className="p-6 space-y-4 md:space-y-6 sm:p-8">
