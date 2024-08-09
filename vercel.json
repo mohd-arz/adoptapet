@@ -1,7 +1,0 @@
-{
-  "functions": {
-    "src/lib/action.ts": {
-      "includeFiles": "node_modules/sharp/**/*"
-    }
-  }
-}
