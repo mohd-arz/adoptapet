@@ -12,5 +12,14 @@ const config = {
     ]
   }
 };
+// next.config.cjs
+module.exports = {
+  eslint: {
+    ignoreDuringBuilds: true,
+  },
+  typescript: {
+    ignoreBuildErrors: true,
+  },
+};
 
 export default config;

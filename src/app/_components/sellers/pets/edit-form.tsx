@@ -75,7 +75,7 @@ export default function FormComponent({pet}:{pet:petType}):JSX.Element{
   if(!pet)return(
     <div>Error</div>
   )
-  const BASE_URL = "http://localhost:3000";
+  const BASE_URL = process.env.NEXTAUTH_URL ??  "http://localhost:3000";
   const [breeds,setBreeds ] = useState<breedType[]>([]);
   const [locations,setLocations] = useState<locationType[]>([]);
   const router = useRouter()

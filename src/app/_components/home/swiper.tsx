@@ -88,7 +88,7 @@ function SlideElement({pet}:{pet:any}):JSX.Element{
       WebkitMaskSize:'85%',    
       maskPosition:"center",
     }
-  const BASE_URL = "http://localhost:3000"
+    const BASE_URL = process.env.NEXTAUTH_URL ??  "http://localhost:3000";
   return (
     <div style={{ maxWidth:'350px' }} className="flex flex-col w-full max-h-500 bg-cyan rounded-2xl">
         <div className="w-full" style={maskStyle}>
