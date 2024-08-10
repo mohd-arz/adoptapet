@@ -5,7 +5,7 @@ import { getServerAuthSession } from "~/lib/auth";
 
 export default async function(){
   const session = await getServerAuthSession();
-  if(!session)redirect('/signin/')
+  if(!session)redirect('/sellers/signin/')
   // const customer = await fetchCustomers();
   return (
     <main>

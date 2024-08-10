@@ -113,8 +113,8 @@ export const authOptions:NextAuthOptions = {
     }
   },
   pages: {
-    signIn: '/auth/signin',
-    newUser: '/seller/signup'
+    signIn: '/sellers/signin/',
+    newUser: '/sellers/signup'
   }
 }
 

@@ -18,7 +18,7 @@ export default async function({
 }){
   const session = await getServerAuthSession();
   console.log(session)
-  if(!session)redirect('/signin/')
+  if(!session)redirect('/sellers/signin/')
   const id =  (session?.user as { id?: number })?.id as number; 
   const query = searchParams?.query || ''
   const currentPage = Number(searchParams?.page) || 1;
