@@ -11,7 +11,7 @@ import { api, } from "~/trpc/server";
 
 export default async function({params}:{params:{id:string}}){
   const session = await getServerAuthSession();
-  if(!session)redirect('/signin/')
+  if(!session)redirect('sellers/signin/')
   const {pet} = await api.pet.getPet({id:params.id})
   if(!pet){
     toast({
