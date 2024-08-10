@@ -10,6 +10,7 @@ import { useRecoilValue } from 'recoil';
 import {  type } from '~/lib/atom';
 import { api } from '~/trpc/react';
 import { PetType } from '@prisma/client';
+import { CldImage } from 'next-cloudinary';
 export type petType= inferRouterOutputs<AppRouter>['pet']['getNewPets'];
 
 
@@ -93,12 +94,13 @@ function SlideElement({pet}:{pet:any}):JSX.Element{
     <div style={{ maxWidth:'350px' }} className="flex flex-col w-full max-h-500 bg-cyan rounded-2xl">
         <div className="w-full" style={maskStyle}>
           {/* <img src="https://pet-uploads.adoptapet.com/1/b/b/1138469363.jpg" className="w-full" style={{objectFit:'cover'}} alt="Dog Image"/> */}
-           <img
+           {/* <img
               src={`${BASE_URL}/${pet.image_url}`}
               style={{objectFit:'cover',aspectRatio:'1/1'}}
               width={'350'}
               alt={`${pet.name}'s profile pictures`}
-            />
+            /> */}
+            <CldImage src={pet.image_url} width={350} height={350} style={{objectFit:'cover',aspectRatio:'1/1'}} alt={`${pet.name}'s profile pictures`}/>
         </div>
       <div className="text-left mx-4 mb-4">
         <div className="border border-black">

@@ -1,11 +1,13 @@
 import { redirect } from "next/navigation"
 import { Suspense } from "react"
 import { AddPet } from "~/app/_components/sellers/pets/buttons"
+import CloudImage from "~/app/_components/sellers/pets/cloudinary-img"
 import Pagination from "~/app/_components/sellers/pets/pagination"
 import Search from "~/app/_components/sellers/pets/search"
 import Table from "~/app/_components/sellers/pets/table"
 import { lusitana } from "~/app/_components/utils/font"
 import { getServerAuthSession } from "~/lib/auth"
+import { cloudinary } from "~/lib/cloudinary"
 import { api } from "~/trpc/server"
 
 export default async function({
@@ -17,12 +19,13 @@ export default async function({
   }
 }){
   const session = await getServerAuthSession();
-  console.log(session)
   if(!session)redirect('/sellers/signin/')
   const id =  (session?.user as { id?: number })?.id as number; 
   const query = searchParams?.query || ''
   const currentPage = Number(searchParams?.page) || 1;
   const {totalPages} =  await api.pet.getPetTablePages({id:+id,query});
+  // const response = await cloudinary.api.resource('pet_upload/4b4191bd-ccfe-4d62-9935-9343df22efa1-1723282005883.webp')
+  // console.log('response ',response);
   return (
     <div className="w-full">
       <div className="flex w-full items-center justify-between">

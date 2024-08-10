@@ -4,6 +4,7 @@ import { db } from "~/server/db";
 import { DeletePet, EditPet } from "./buttons";
 import { PetType } from "@prisma/client";
 import { api } from "~/trpc/server";
+import CloudImage from "./cloudinary-img";
 
 const ITEMS_PER_PAGE = 10;
 
@@ -27,13 +28,14 @@ export default async function({query,currentPage}:{query:string,currentPage:numb
                     <div className="flex items-center justify-between border-b pb-4">
                       <div>
                         <div className="mb-2 flex items-center">
-                          <img 
+                          {/* <img 
                             src={`${BASE_URL}/${pet.thumb_url}`}
                             className="mr-2 rounded-full"
                             width={28}
                             height={28}
                             alt={`${pet.name}'s profile picture`}
-                          />
+                          /> */}
+                          <CloudImage src={pet.image_url} class_="rounded-full" width={28} height={28} alt={`${pet.name} image`}/>
                           <p>{pet.name}</p>
                         </div>
                         <p className="text-sm text-gray-500">{pet.type}</p>
@@ -83,13 +85,14 @@ export default async function({query,currentPage}:{query:string,currentPage:numb
                     >
                       <td className="whitespace-nowrap py-3 pl-6 pr-3">
                         <div className="flex items-center gap-3">
-                          <Image
+                          {/* <Image
                             src={`${BASE_URL}/${pet.thumb_url}`}
                             className="rounded-full"
                             width={28}
                             height={28}
                             alt={`${pet.name}'s profile picture`}
-                          />
+                          /> */}
+                          <CloudImage src={pet.image_url} class_="rounded-full" width={28} height={28} alt={`${pet.name} image`}/>
                           <p>{pet.name}</p>
                         </div>
                       </td>

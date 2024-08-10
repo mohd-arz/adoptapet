@@ -11,6 +11,8 @@ import { formType as EditType, petType } from '~/app/_components/sellers/pets/ed
 import { formType as CreateType } from '~/app/_components/sellers/pets/create-form';
 import { redirect } from 'next/navigation';
 import { revalidatePath } from 'next/cache';
+import { cloudinary } from './cloudinary';
+import { UploadApiResponse } from 'cloudinary';
 
 export async function storePet(formData:FormData){
   const session = await getServerAuthSession();
@@ -30,30 +32,45 @@ export async function storePet(formData:FormData){
     form['breed'] = formData.get('breed') as string;
   const breedId = form.breed ? parseInt(form.breed) : null;
   const image = form.image_url;
-  const buffer = Buffer.from(await image.arrayBuffer());
+  const uIntBuffer = new Uint8Array(await image.arrayBuffer());
+  // const buffer = Buffer.from(await image.arrayBuffer());
   const ext = path.extname(image.name);
-  const uniqueFilename = `${uuidv4()}-${Date.now()}${ext}`;
-  const absolutePath = path.join(process.cwd(),'public','uploads');
-  const filePath = path.join(absolutePath,uniqueFilename);
-  const relativePath = path.join('uploads',uniqueFilename);
-
-  const thumbnailBuffer = await sharp(buffer)
-  .resize(100, 100)
-  .toBuffer();
-  const uniqueFilenameT = `thumb-${uuidv4()}-${Date.now()}${ext}`;  
-  const filePathT =  path.join(absolutePath,uniqueFilenameT);
-  const relativePathT = path.join('uploads',uniqueFilenameT);
+  // const uniqueFilename = `${uuidv4()}-${Date.now()}${ext}`;
+  // const absolutePath = path.join(process.cwd(),'public','uploads');
+  // const filePath = path.join(absolutePath,uniqueFilename);
+  // const relativePath = path.join('uploads',uniqueFilename);
+  const uniqueFilename = `${uuidv4()}-${Date.now()}`;
 
   try{
-    await fs.mkdir(absolutePath,{recursive:true});
-    await fs.writeFile(filePath,buffer);
-    await fs.writeFile(filePathT,thumbnailBuffer);
+  const result:UploadApiResponse = await new Promise<UploadApiResponse>((resolve,reject)=>{
+    cloudinary.uploader.upload_stream( {
+      folder: 'pet_upload', 
+      public_id: uniqueFilename,
+    },
+    (error, result) => {
+      if(error) return reject(error);
+      if(result)resolve(result);
+    }).end(uIntBuffer)
+  })
+  // const thumbnailBuffer = await sharp(buffer)
+  // .resize(100, 100)
+  // .toBuffer();
+  // const uniqueFilenameT = `thumb-${uuidv4()}-${Date.now()}${ext}`;  
+  // const filePathT =  path.join(absolutePath,uniqueFilenameT);
+  // const relativePathT = path.join('uploads',uniqueFilenameT);
+
+    //Local Storing -- 
+    // await fs.mkdir(absolutePath,{recursive:true});
+    // await fs.writeFile(filePath,buffer);
+    // await fs.writeFile(filePathT,thumbnailBuffer);
+
+    //Storing extension
     const pet = await db.pet.create({
       data:{
         name:form.name,
         age:form.age,
-        image_url:relativePath,
-        thumb_url:relativePathT,
+        image_url:result.public_id,
+        thumb_url:ext,
         type:form.type,
         sex:form.sex,
         location_id:+form.location,
@@ -77,8 +94,10 @@ export async function updatePet(stringify:string,form:FormData,{id,image_url,thu
   if(form.get('image')){
     const image = form.get('image') as File;
     const buffer = Buffer.from(await image.arrayBuffer());
+    const uIntBuffer = new Uint8Array(await image.arrayBuffer());
     const ext = path.extname(image.name);
-    const uniqueFilename = `${uuidv4()}-${Date.now()}${ext}`;
+    // const uniqueFilename = `${uuidv4()}-${Date.now()}${ext}`;
+    const uniqueFilename = `${uuidv4()}-${Date.now()}`;
     const absolutePath = path.join(process.cwd(),'public','uploads');
     const filePath = path.join(absolutePath,uniqueFilename);
     const relativePath = path.join('uploads',uniqueFilename);
@@ -92,18 +111,29 @@ export async function updatePet(stringify:string,form:FormData,{id,image_url,thu
     const oldFile = path.join(process.cwd(),'public',image_url);
     const oldFileT = path.join(process.cwd(),'public',thumb_url);
     try{
-      await fs.unlink(oldFile)
-      await fs.unlink(oldFileT)
-      await fs.mkdir(absolutePath,{recursive:true});
-      await fs.writeFile(filePath,buffer);
-      await fs.writeFile(filePathT,thumbnailBuffer);
+      // await fs.unlink(oldFile)
+      // await fs.unlink(oldFileT)
+      // await fs.mkdir(absolutePath,{recursive:true});
+      // await fs.writeFile(filePath,buffer);
+      // await fs.writeFile(filePathT,thumbnailBuffer);
+      cloudinary.uploader.destroy(image_url)
+      const result:UploadApiResponse = await new Promise<UploadApiResponse>((resolve,reject)=>{
+        cloudinary.uploader.upload_stream( {
+          folder: 'pet_upload', 
+          public_id: uniqueFilename,
+        },
+        (error, result) => {
+          if(error) return reject(error);
+          if(result)resolve(result);
+        }).end(uIntBuffer)
+      })
       const pet = await db.pet.update({
         where:{
           id:id,
         },
         data:{  
-          image_url:relativePath,
-          thumb_url:relativePathT,
+          image_url:result.public_id,
+          thumb_url:ext,
         }
       })
     }catch(err:any){ 

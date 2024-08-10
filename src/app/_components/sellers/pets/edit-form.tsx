@@ -28,6 +28,8 @@ import { updatePet } from "~/lib/action"
 import { ToastAction } from "~/components/ui/toast"
 import { Toaster } from "~/components/ui/toaster"
 import { useRouter } from "next/navigation"
+import CloudImage from "./cloudinary-img"
+import { getSecureUrl } from "~/lib/utils"
 
 const OTHERS = [
   'Rabbits',
@@ -182,14 +184,15 @@ export default function FormComponent({pet}:{pet:petType}):JSX.Element{
           )}
         />
       <Suspense fallback={<div>Loading</div>}>
-          <Link href={`${BASE_URL}/${pet.image_url}`}>
-            <Image
+          <Link href={getSecureUrl(pet.image_url,pet.thumb_url as string)} passHref>
+            {/* <Image
               src={`${BASE_URL}/${pet.thumb_url}`}
               width={100}
               height={100}
               alt={`${pet.name}'s profile picture`}
               className="border border-blue-300 rounded-xl"
-            />
+            /> */}
+            <CloudImage src={pet.image_url} class_="border border-blue-300 rounded-xl" width={100} height={100} alt={`${pet.name} image`}/>
           </Link>
       </Suspense>
         {/* Image */}

@@ -37,3 +37,8 @@ export const generatePagination = (currentPage: number, totalPages: number) => {
     totalPages,
   ];
 };
+
+export const getSecureUrl = (publicId: string, format: string = 'jpg') => {
+  const cloudName = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME; // Ensure this is set in your environment variables
+  return `https://res.cloudinary.com/${cloudName}/image/upload/${publicId}${format}`;
+};
