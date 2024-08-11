@@ -13,7 +13,6 @@ import { type as typeState } from "~/lib/atom";
 export function Header(){
   return(
     <header className="border">
-      <NavBar/>
       <Banner/>
       <div className="empty-cyan h-10 bg-cyan"></div>
       <div className="empty-blue h-16 bg-blue"></div>
@@ -21,7 +20,7 @@ export function Header(){
   );
 }
 
-function NavBar():JSX.Element{
+export function NavBar():JSX.Element{
   return (
     <div className="wrapper bg-cyan">
       <nav className="flex flex-row justify-between items-center px-[5%] mx-auto border border-red-500 max-w-[1400px] h-[88px]">

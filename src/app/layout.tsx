@@ -8,6 +8,7 @@ import PrelineScript from "./_components/preline-script";
 import { ThemeProvider } from '@mui/material/styles';
 import theme from "~/app/_components/utils/theme";
 import RecoilContextProvider from "./_components/recoil-context-provider";
+import { NavBar } from "./_components/home/header";
 
 export const metadata: Metadata = {
   title: "Create T3 App",
@@ -25,6 +26,7 @@ export default function RootLayout({
         <ThemeProvider theme={theme}>
             <RecoilContextProvider>
               <TRPCReactProvider>
+                <NavBar/>
                 {children}
               </TRPCReactProvider>
             </RecoilContextProvider>
