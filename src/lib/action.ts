@@ -163,10 +163,11 @@ export async function updatePet(stringify:string,form:FormData,{id,image_url,thu
 
 export async function deletePet(id:number,image_url:string,thumb_url:string){
   try{
-    const oldFile = path.join(process.cwd(),'public',image_url);
-    const oldFileT = path.join(process.cwd(),'public',thumb_url);
-    await fs.unlink(oldFile)
-    await fs.unlink(oldFileT)
+    // const oldFile = path.join(process.cwd(),'public',image_url);
+    // const oldFileT = path.join(process.cwd(),'public',thumb_url);
+    // await fs.unlink(oldFile)
+    // await fs.unlink(oldFileT)
+    cloudinary.uploader.destroy(image_url)
     const pet = await db.pet.delete({
       where:{
         id
