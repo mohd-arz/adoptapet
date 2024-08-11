@@ -18,6 +18,7 @@ const CustomPaper = (props:any) => (
   <Paper
     {...props}
     sx={{
+      boxShadow: '0px 4px 10px rgba(0, 0, 0, 0.2)', 
       marginTop: '8px',
     }}
   />
@@ -53,19 +54,27 @@ export function LocationInput({locations,setLocation}:{locations:locationType[],
               },
               '& input': {
                 fontSize:'1.2rem',
-                padding: '0', // Remove padding from the input field
+                padding: '0', 
               },
               '& .MuiInputLabel-root': {
-                color: 'black', // Set the label color
+                color: 'black', 
                 '&.Mui-focused': {
-                  color: 'black', // Set the label color when focused
+                  color: 'black', 
                 },
               },
               '& .MuiInputLabel-shrink': {
-                transform: 'translate(6px, 1px) scale(.8)', // Center the label at the top border line
+                transform: 'translate(6px, 1px) scale(.8)',
               },
           }}
         />
+        )}
+        renderOption={(props, option) => (
+          <li
+            {...props}
+            className={`hover:bg-slate-100 hover:font-bold px-2 py-1`}
+          >
+            {option.name}
+          </li>
         )}
       />
   )
@@ -135,9 +144,21 @@ export function AgeInput({ages,age,setAge}:{ages:ageType[],age:PetAge[],setAge:R
           MenuProps={MenuProps}
         >
           {ages.map((item) => (
-              <MenuItem key={item.value} value={item.value}>
-              <Checkbox checked={age.indexOf(item.value) > -1} />
-              <ListItemText primary={item.name} />
+              <MenuItem key={item.value} value={item.value}   
+              sx={{
+                '&:hover': {
+                  backgroundColor: '#f1f5f9', 
+                },
+              }} >
+              <Checkbox 
+              checked={age.indexOf(item.value) > -1}   
+              sx={{
+                color: 'black', 
+                '&.Mui-checked': {
+                  color: 'black', 
+                },
+              }}/>
+              <ListItemText primary={item.name}/>
             </MenuItem>
           ))}
         </Select>
@@ -164,11 +185,15 @@ export function BreedInput({breed,breeds,setBreed}:{breed:breedType[],breeds:bre
       renderOption={(props, option, { selected }) => {
         const { key, ...optionProps } = props;
         return (
-          <li key={key} {...optionProps}>
+          <li key={key} {...optionProps} className='hover:bg-slate-100 hover:font-bold'>
             <Checkbox
               style={{ marginRight: 8 }}
               checked={selected}
-            />
+              sx={{
+                '&.Mui-checked': {
+                  color: 'black', 
+                },
+              }}/>
             {option.name}
           </li>
         );
@@ -197,16 +222,16 @@ export function BreedInput({breed,breeds,setBreed}:{breed:breedType[],breeds:bre
           },
           '& input': {
             fontSize:'1.2rem',
-            padding: '0', // Remove padding from the input field
+            padding: '0', 
           },
           '& .MuiInputLabel-root': {
-            color: 'black', // Set the label color
+            color: 'black', 
             '&.Mui-focused': {
-              color: 'black', // Set the label color when focused
+              color: 'black', 
             },
           },
           '& .MuiInputLabel-shrink': {
-            transform: 'translate(6px, 1px) scale(.8)', // Center the label at the top border line
+            transform: 'translate(6px, 1px) scale(.8)', 
           },
       }}/>
       )}

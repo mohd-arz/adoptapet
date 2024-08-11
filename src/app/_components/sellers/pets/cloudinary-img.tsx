@@ -9,6 +9,8 @@ export default function CloudImage({src,class_,width,height,alt}:{src:string,cla
       className={class_}
       width={width}
       height={height}
+      quality={'auto'}
+      format='auto'
       alt={alt}
       gravity='auto'
       crop={{

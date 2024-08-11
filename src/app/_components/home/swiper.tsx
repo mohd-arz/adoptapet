@@ -100,7 +100,7 @@ function SlideElement({pet}:{pet:any}):JSX.Element{
               width={'350'}
               alt={`${pet.name}'s profile pictures`}
             /> */}
-            <CldImage src={pet.image_url} width={350} height={350} style={{objectFit:'cover',aspectRatio:'1/1'}} alt={`${pet.name}'s profile pictures`}/>
+            <CldImage src={pet.image_url} width={350} height={350} style={{objectFit:'cover',aspectRatio:'1/1'}}  quality={'auto'}format='auto'gravity='auto' crop={'fill'} alt={`${pet.name}'s profile pictures`}/>
         </div>
       <div className="text-left mx-4 mb-4">
         <div className="border border-black">
