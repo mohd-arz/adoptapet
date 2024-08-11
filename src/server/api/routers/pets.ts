@@ -67,7 +67,7 @@ export const petRouter = createTRPCRouter({
   getPet:protectedProcedure
   .input(z.object({id:z.string()}))
   .query(async({input})=>{
-    const pet = await db.pet.findUnique({where:{id:+input.id}});
+    const pet = await db.pet.findUnique({where:{id:+input.id},include:{SubImages:true}});
     return {pet};
   }),//Count for Pet Table
   getPetTablePages:protectedProcedure
@@ -101,7 +101,9 @@ export const petRouter = createTRPCRouter({
         OR:conditions(query)
       },orderBy:{
         createdAt:'desc'
-      },
+      },include:{
+        SubImages:true,
+      }
     })
   }),
   getNewPets:publicProcedure

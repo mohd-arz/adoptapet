@@ -15,14 +15,6 @@ import { PetAge, PetSex, PetType } from "@prisma/client"
 import { toast } from "~/components/ui/use-toast"
 import { api } from "~/trpc/react"
 import Image from "next/image"
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "~/components/ui/dialog"
 import Link from "next/link"
 import { updatePet } from "~/lib/action"
 import { ToastAction } from "~/components/ui/toast"
@@ -41,7 +33,12 @@ const MAX_FILE_SIZE = 3 * 1024 * 1024;
 
 export const petFormSchema = z.object({
   name: z.string().min(2).max(50),
-  image_url: z.instanceof(File).optional().refine(file=> !file || file.size <= MAX_FILE_SIZE,{message:'Image should not exceed 3MB'}),
+  image_url: z.instanceof(File).optional().refine(file=> !file || file.size <= MAX_FILE_SIZE,{message:'Main Image should not exceed 3MB'}),
+  sub_url: z.array(z.instanceof(File),{message:'Sub Image is required'})
+  .max(4, { message: 'You can only upload up to 4 images' }) 
+  .refine(files => files.every(file => !file || file.size <= MAX_FILE_SIZE), {
+    message: 'Each Sub Image should not exceed 3MB',
+  }).optional(),
   sex: z.enum([PetSex.FEMALE,PetSex.MALE],{message:"Gender is required"}),
   age: z.enum([PetAge.YOUNG,PetAge.ADULT,PetAge.SENIOR],{message:'Age is required'}),
   type: z.enum([PetType.DOG,PetType.CAT,PetType.OTHERS],{message:"Type is required"}),
@@ -84,6 +81,7 @@ export default function FormComponent({pet}:{pet:petType}):JSX.Element{
     defaultValues:{
       name:pet?.name,
       image_url:undefined,
+      sub_url: undefined,
       sex:pet.sex ? pet.sex : undefined,
       type:pet.type,
       age:pet.age ? pet.age : undefined,
@@ -126,7 +124,14 @@ export default function FormComponent({pet}:{pet:petType}):JSX.Element{
       const form = new FormData();
       if(values.image_url)
       form.append('image',values.image_url);
-      const res = await updatePet(stringify,form,{id:pet?.id as number,image_url:pet?.image_url as string,thumb_url:pet?.thumb_url as string})
+      if (Array.isArray(values.sub_url)) {
+        values.sub_url.forEach((file,i) => {
+          if (file instanceof File) {
+            form.append(`sub_url`, file);
+          }
+        });
+      }
+      const res = await updatePet(stringify,form,pet as petType)
       if(res.status){
         toast({
           description: res.message,
@@ -182,7 +187,7 @@ export default function FormComponent({pet}:{pet:petType}):JSX.Element{
           )}
         />
       <Suspense fallback={<div>Loading</div>}>
-          <Link href={`${BASE_URL}/${pet.image_url}`}>
+          <Link href={`${BASE_URL}/${pet.image_url}`} target="_blank">
             <Image
               src={`${BASE_URL}/${pet.thumb_url}`}
               width={100}
@@ -207,6 +212,41 @@ export default function FormComponent({pet}:{pet:petType}):JSX.Element{
             </FormItem>
           )
         }}></FormField>
+        <div className="flex flex-row gap-4">
+          {
+            pet.SubImages && pet.SubImages.map(img=>
+              <Suspense key={img.id} fallback={<div>Loading</div>}>
+                  <Link href={`${BASE_URL}/${img.sub_url}`} key={img.id} target="_blank">
+                    <Image
+                      src={`${BASE_URL}/${img.sub_url}`}
+                      width={100}
+                      height={100}
+                      alt={`${pet.name}'s sub picture`}
+                      className="border border-blue-300 rounded-xl"
+                    />
+                  </Link>
+              </Suspense>
+            )
+          }
+        </div>
+      {/* Sub Images */}
+      <FormField control={formState.control} name="sub_url" render={({field: { value, onChange, ...fieldProps } })=>{
+        return(
+          <FormItem>
+            <FormLabel>Sub Images</FormLabel>
+            <FormControl>
+              <Input type="file" id="picture" {...fieldProps}  multiple  accept="image/*"
+              onChange={(e) => {
+                const files = e.target.files ? Array.from(e.target.files) : [];
+                onChange(files);
+              }}>
+            </Input>
+            </FormControl>
+              <FormDescription>Upload New Sub Images If needed</FormDescription>
+            <FormMessage/>
+          </FormItem>
+        )
+      }}></FormField>
          {/* Sex */}
         <FormField
             control={formState.control}

@@ -4,6 +4,7 @@ import { db } from "~/server/db";
 import { DeletePet, EditPet } from "./buttons";
 import { PetType } from "@prisma/client";
 import { api } from "~/trpc/server";
+import { petType } from "./edit-form";
 
 const ITEMS_PER_PAGE = 10;
 
@@ -46,7 +47,7 @@ export default async function({query,currentPage}:{query:string,currentPage:numb
                       </div>
                       <div className="flex justify-end gap-2">
                         <EditPet id={pet.id} />
-                        {/* <DeleteInvoice id={invoice.id} /> */}
+                        <DeletePet pet={pet as petType}/>
                       </div>
                     </div>
                   </div>
@@ -105,7 +106,7 @@ export default async function({query,currentPage}:{query:string,currentPage:numb
                       <td className="whitespace-nowrap py-3 pl-0 pr-3">
                         <div className="flex gap-3">
                           <EditPet id={pet.id} />
-                          <DeletePet id={pet.id} image_url={pet.image_url} thumb_url={pet.thumb_url as string}/>
+                          <DeletePet pet={pet as petType}/>
                         </div>
                       </td>
                     </tr>

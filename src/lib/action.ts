@@ -11,6 +11,13 @@ import { formType as EditType, petType } from '~/app/_components/sellers/pets/ed
 import { formType as CreateType } from '~/app/_components/sellers/pets/create-form';
 import { redirect } from 'next/navigation';
 import { revalidatePath } from 'next/cache';
+import { AppRouter } from '~/server/api/root';
+import { inferRouterOutputs } from '@trpc/server';
+
+type SubImageType = {
+  sub_url:string,
+  pet_id:number
+}
 
 export async function storePet(formData:FormData){
   const session = await getServerAuthSession();
@@ -18,6 +25,7 @@ export async function storePet(formData:FormData){
   const form:CreateType = {
     name: formData.get('name') as string,
     image_url: formData.get('image_url') as File,
+    sub_url: formData.getAll('sub_url') as File[],
     type:formData.get('type') as PetType,
     sex: formData.get('sex') as PetSex,
     age: formData.get('age') as PetAge,
@@ -48,29 +56,42 @@ export async function storePet(formData:FormData){
     await fs.mkdir(absolutePath,{recursive:true});
     await fs.writeFile(filePath,buffer);
     await fs.writeFile(filePathT,thumbnailBuffer);
-    const pet = await db.pet.create({
-      data:{
-        name:form.name,
-        age:form.age,
-        image_url:relativePath,
-        thumb_url:relativePathT,
-        type:form.type,
-        sex:form.sex,
-        location_id:+form.location,
-        other:form.other,
-        breed_id:breedId,
-        createdBy:+id,
+    await db.$transaction(async(db)=>{
+      const pet = await db.pet.create({
+        data:{
+          name:form.name,
+          age:form.age,
+          image_url:relativePath,
+          thumb_url:relativePathT,
+          type:form.type,
+          sex:form.sex,
+          location_id:+form.location,
+          other:form.other,
+          breed_id:breedId,
+          createdBy:+id,
+        }
+      })
+      if(pet.id){
+        const urls:SubImageType[] = []; 
+        for (const img of form.sub_url) {
+          const buffer = Buffer.from(await img.arrayBuffer());
+          const ext = path.extname(img.name);
+          const uniqueFilename = `${uuidv4()}-${Date.now()}${ext}`;
+          const filePath = path.join(absolutePath, uniqueFilename);
+          await fs.writeFile(filePath, buffer);
+          const relativePath = path.join('uploads', uniqueFilename);
+          urls.push({ sub_url: relativePath, pet_id: pet.id });
+        }
+        await db.subImages.createMany({data:urls})
       }
     })
     return {message:"Added Successfully",status:true}
   }catch(err:any){ 
     return { message: "An error occurred", error: err.message,status:false };
   }
-}
-
-
-
-export async function updatePet(stringify:string,form:FormData,{id,image_url,thumb_url}:{id:number,image_url:string,thumb_url:string}){
+}``
+export async function updatePet(stringify:string,form:FormData,pet:petType){
+  if(!pet)return {message:"An error occurred",status:false};
   const values:EditType = JSON.parse(stringify);
   const session = await getServerAuthSession();
   if(!session)return {message:"UnAuthorized",status:false};
@@ -89,17 +110,17 @@ export async function updatePet(stringify:string,form:FormData,{id,image_url,thu
     const filePathT =  path.join(absolutePath,uniqueFilenameT);
     const relativePathT = path.join('uploads',uniqueFilenameT);
 
-    const oldFile = path.join(process.cwd(),'public',image_url);
-    const oldFileT = path.join(process.cwd(),'public',thumb_url);
+    const oldFile = path.join(process.cwd(),'public',pet.image_url);
+    const oldFileT = path.join(process.cwd(),'public',pet.thumb_url as string);
     try{
       await fs.unlink(oldFile)
       await fs.unlink(oldFileT)
       await fs.mkdir(absolutePath,{recursive:true});
       await fs.writeFile(filePath,buffer);
       await fs.writeFile(filePathT,thumbnailBuffer);
-      const pet = await db.pet.update({
+      const newPet = await db.pet.update({
         where:{
-          id:id,
+          id:pet.id,
         },
         data:{  
           image_url:relativePath,
@@ -110,10 +131,37 @@ export async function updatePet(stringify:string,form:FormData,{id,image_url,thu
       return { message: "An error occurred", error: err.message,status:false };
     }
   }
-  try{
-    const pet = await db.pet.update({
+  if(form.getAll('sub_url').length > 0){
+    const images = form.getAll('sub_url') as File[];
+    const urls:SubImageType[] = []; 
+    await db.subImages.deleteMany({
       where:{
-        id:id,
+        pet_id:pet.id,
+      }
+    });
+    for(const img of pet.SubImages){
+      const oldFile = path.join(process.cwd(),'public',img.sub_url);
+      if (await fileExists(oldFile)) {
+        await fs.unlink(oldFile);
+      }
+    }
+
+    for (const img of images) {   
+      const buffer = Buffer.from(await img.arrayBuffer());
+      const ext = path.extname(img.name);
+      const uniqueFilename = `${uuidv4()}-${Date.now()}${ext}`;
+      const absolutePath = path.join(process.cwd(),'public','uploads');
+      const filePath = path.join(absolutePath, uniqueFilename);
+      await fs.writeFile(filePath, buffer);
+      const relativePath = path.join('uploads', uniqueFilename);
+      urls.push({ sub_url: relativePath, pet_id: pet.id });
+    }
+    await db.subImages.createMany({data:urls})
+  }
+  try{
+    const newPet = await db.pet.update({
+      where:{
+        id:pet.id,
       },  
       data:{  
         name:values.name,
@@ -131,21 +179,47 @@ export async function updatePet(stringify:string,form:FormData,{id,image_url,thu
   }
 }
 
-export async function deletePet(id:number,image_url:string,thumb_url:string){
+export async function deletePet(pet:petType){
+  if(!pet)return {message:"An error occurred",status:false};
+  console.log('ppet ',pet?.SubImages)
   try{
-    const oldFile = path.join(process.cwd(),'public',image_url);
-    const oldFileT = path.join(process.cwd(),'public',thumb_url);
-    await fs.unlink(oldFile)
-    await fs.unlink(oldFileT)
-    const pet = await db.pet.delete({
+    const oldFile = path.join(process.cwd(),'public',pet.image_url);
+    const oldFileT = path.join(process.cwd(),'public',pet.thumb_url as string);
+    for(const img of pet.SubImages){
+      const oldFile = path.join(process.cwd(),'public',img.sub_url);
+      if (await fileExists(oldFile)) {
+        await fs.unlink(oldFile);
+      }
+    }
+    if (await fileExists(oldFile)) {
+      await fs.unlink(oldFile);
+    }
+  
+    if (await fileExists(oldFileT)) {
+      await fs.unlink(oldFileT);
+    }
+    await db.subImages.deleteMany({
       where:{
-        id
+        pet_id:pet.id,
+      }
+    });
+    await db.pet.delete({
+      where:{
+        id:pet.id
       }
     })
-    console.log('came here')
     revalidatePath('/sellers/pets');
     return {message:"Deleted Successfully",status:true}
   }catch(err:any){
     return {message:'An error occured',error:err.message,status:false}
+  }
+}
+
+export async function fileExists(filePath: string): Promise<boolean> {
+  try {
+    await fs.access(filePath);
+    return true;
+  } catch {
+    return false;
   }
 }

@@ -7,7 +7,7 @@ import { TRPCReactProvider } from "~/trpc/react";
 import PrelineScript from "./_components/preline-script";
 import { ThemeProvider } from '@mui/material/styles';
 import theme from "~/app/_components/utils/theme";
-import RecoilContextProvider from "./recoil-context-provider";
+import RecoilContextProvider from "./_components/recoil-context-provider";
 
 export const metadata: Metadata = {
   title: "Create T3 App",
