@@ -10,6 +10,15 @@ import { useRecoilValue } from 'recoil';
 import {  type } from '~/lib/atom';
 import { api } from '~/trpc/react';
 import { PetType } from '@prisma/client';
+import Image from 'next/image';
+import Link from 'next/link';
+import { Gloock}from '@next/font/google'
+
+const gloock = Gloock({
+  weight: ["400"],
+  subsets:["latin"],
+});
+
 export type petType= inferRouterOutputs<AppRouter>['pet']['getNewPets'];
 
 
@@ -34,46 +43,54 @@ export function SwiperContainer():JSX.Element{
     }
   };
   return (
-    <div className="relative px-8">
-    <Swiper
-        spaceBetween={50}
-        slidesPerView={3}
-        loop={true}
-        onSlideChange={() => console.log('slide change')}
-        onSwiper={(swiper) => console.log(swiper)}
-        ref={swiperRef}
-      >
-        {isSuccess ? data.map((pet,index)=>(
-          <SwiperSlide key={index}><SlideElement pet={pet}/></SwiperSlide>
-        ))
-        :
-        <div className='flex gap-8'>
-        <SlideElementSkeleton/>
-        <SlideElementSkeleton/>
-        <SlideElementSkeleton/>
-        </div>
-         }
-      </Swiper>
-      <ChevronLeft
-        className="prev-arrow absolute left-0 top-2/4 cursor-pointer border border-black bg-slate-200 rounded-lg"
-        onClick={handlePrev}
-        style={{
-          color: "lightgray",
-          stroke: "black",
-          strokeWidth: "0.75",
-          fontSize: "20px",
-        }}
-      />
-      <ChevronRight
-        className="next-arrow absolute right-0 top-2/4 cursor-pointer border border-black bg-slate-200 rounded-lg"
-        onClick={handleNext}
-        style={{
-          color: "lightgray",
-          stroke: "black",
-          strokeWidth: "0.75",
-          fontSize: "20px",
-        }}
-      />
+    <div className="relative px-16">
+      {
+        (isSuccess && data.length > 0) ? (
+          <>
+          <Swiper
+            spaceBetween={50}
+            slidesPerView={3}
+            loop={true}
+            onSlideChange={() => console.log('slide change')}
+            onSwiper={(swiper) => console.log(swiper)}
+            ref={swiperRef}
+          >
+          { data.map((pet,index)=>(
+            <SwiperSlide key={index}>
+              <Link href={`/pet/${pet.id}`}>
+                <SlideElement pet={pet}/>
+              </Link>
+            </SwiperSlide>
+           ))
+          }
+          </Swiper> 
+            <ChevronLeft
+              className="prev-arrow absolute left-0 top-1/2 cursor-pointer "
+              onClick={handlePrev}
+              size={45}
+              style={{
+                strokeWidth: "1",
+              }}
+            />
+            <ChevronRight
+              className="next-arrow absolute right-0 top-1/2 cursor-pointer"
+              onClick={handleNext}
+              size={45}
+              style={{
+                strokeWidth: "1",
+              }}
+            />
+          </>
+          )
+          : (
+          <div className='flex gap-8'>
+            <SlideElementSkeleton/>
+            <SlideElementSkeleton/>
+            <SlideElementSkeleton/>
+        </div> )
+      }
+   
+    
     </div>
   )
 }
@@ -88,21 +105,24 @@ function SlideElement({pet}:{pet:any}):JSX.Element{
       WebkitMaskSize:'85%',    
       maskPosition:"center",
     }
-  const BASE_URL = "http://localhost:3000"
+  const BASE_URL = process.env.NEXTAUTH_URL || "http://localhost:3000";
   return (
     <div style={{ maxWidth:'350px' }} className="flex flex-col w-full max-h-500 bg-cyan rounded-2xl">
-        <div className="w-full" style={maskStyle}>
-          {/* <img src="https://pet-uploads.adoptapet.com/1/b/b/1138469363.jpg" className="w-full" style={{objectFit:'cover'}} alt="Dog Image"/> */}
-           <img
+        <div className={`w-full`} style={{
+          ...maskStyle, 
+          backgroundColor:'grey'
+        }}>
+           <Image
               src={`${BASE_URL}/${pet.image_url}`}
               style={{objectFit:'cover',aspectRatio:'1/1'}}
               width={'350'}
+              height={'350'}
               alt={`${pet.name}'s profile pictures`}
             />
         </div>
       <div className="text-left mx-4 mb-4">
         <div className="border border-black">
-          <h1 className="text-4xl truncate">{pet.name}</h1> 
+          <h1 className={`text-4xl truncate ${gloock.className}`}>{pet.name}</h1> 
         </div>
         {
           pet.type == 'DOG' ? (

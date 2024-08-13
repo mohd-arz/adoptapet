@@ -70,7 +70,6 @@ export default function FormComponent():JSX.Element{
           description: res.message,
         })
         setTimeout(()=>{
-          console.log('came inside')
           router.push('/sellers/pets');
           router.refresh();
         },1000)

@@ -1,8 +1,15 @@
 import Link from "next/link";
-import Button from "./_components/home/button";
-import { Header } from "./_components/home/header";
-import { SwiperContainer } from "./_components/home/swiper";
 import { api } from "~/trpc/server";
+import { Header } from "../_components/home/header";
+import { SwiperContainer } from "../_components/home/swiper";
+import Button from "../_components/home/button";
+import Image from "next/image";
+import { Gloock}from '@next/font/google'
+
+const gloock = Gloock({
+  weight: ["400"],
+  subsets:["latin"],
+});
 
 export default async function(){
   return (
@@ -11,7 +18,7 @@ export default async function(){
       <main>
         <section className="px-[5%] my-10 mx-auto border text-center border-red-500 max-w-[1400px]">
           <div>
-            <h1 className="text-5xl">
+            <h1 className={`text-5xl ${gloock.className}`}>
               Meet featured pets
             </h1>
           </div>
@@ -22,11 +29,18 @@ export default async function(){
         </section>
         <div className="wrapper bg-cyan">
           <section className="px-[5%] mx-auto border text-center border-red-500 max-w-[1400px] w-full flex gap-14 ">
-            <div className="w-1/2 py-20">
-              <img src="https://prod-assets.production.omega.aapdev.org/img/HP-GettoKnowUs.png" alt="" />
-            </div>
+          <div className="w-1/2 py-20">
+                <Image
+                  src="/assets/HP-GettoKnowUs.png"
+                  alt="Get to know us"
+                  width={700}
+                  height={475} 
+                  quality={100} 
+                />
+              </div>
+
             <div className="text-left w-1/2 py-24">
-              <h1 className="text-5xl mb-10">Get to know us</h1>
+              <h1 className={`text-5xl mb-10 ${gloock.className}`}>Get to know us</h1>
               <p className="mb-8 text-xl leading-8">
               We know pet adoption, because we're adopters too. We think it's just about the best thing you can do. But we'll be real: it can be a lengthy (paperwork-filled) process.
               <br /><br />
@@ -38,14 +52,18 @@ export default async function(){
               </p>
               <div className="flex gap-4 items-center">
                 <Button type="black" title="How it Works"/>
-                <Link href={''}>More about us</Link>
+                <Link className="group text-black transition-all duration-300 ease-in-out" href="#" >
+                  <span className="bg-left-bottom bg-gradient-to-r from-black to-black bg-[length:0%_2px] bg-no-repeat group-hover:bg-[length:100%_2px] transition-all duration-500 ease-out"> 
+                  More about us
+                  </span>
+                 </Link>
               </div>
             </div>
           </section>
         </div>
         <section className="py-20 mx-auto border text-center border-red-500 max-w-[1400px] min-h-[500px]">
           <div>
-            <h1 className="text-5xl">Check out adoption advice</h1>
+            <h1 className={`text-5xl ${gloock.className}`}>Check out adoption advice</h1>
             <p className="text-xl my-2">Wondering how (and why) you should adopt?</p>
             <p className="text-xl mb-5">Get the inside scoop.</p>
           </div>
@@ -61,9 +79,7 @@ export default async function(){
           </div>
         </section>
       </main>
-      <footer className="h-[300px] bg-cyan">
-        <h1 className="text-[200px] text-center">Logo</h1>
-      </footer>
+   
     </div>
   )
 }

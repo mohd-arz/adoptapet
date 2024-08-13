@@ -64,10 +64,10 @@ export const petRouter = createTRPCRouter({
       console.log(error);
     }
   }),
-  getPet:protectedProcedure
+  getPet:publicProcedure
   .input(z.object({id:z.string()}))
   .query(async({input})=>{
-    const pet = await db.pet.findUnique({where:{id:+input.id},include:{SubImages:true}});
+    const pet = await db.pet.findUnique({where:{id:+input.id},include:{SubImages:true,location:true,breed:true}});
     return {pet};
   }),//Count for Pet Table
   getPetTablePages:protectedProcedure

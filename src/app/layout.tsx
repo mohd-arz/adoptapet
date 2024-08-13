@@ -8,7 +8,13 @@ import PrelineScript from "./_components/preline-script";
 import { ThemeProvider } from '@mui/material/styles';
 import theme from "~/app/_components/utils/theme";
 import RecoilContextProvider from "./_components/recoil-context-provider";
-import { NavBar } from "./_components/home/header";
+import { Work_Sans } from "@next/font/google";
+
+const pacifico = Work_Sans({
+  weight: ["300","400","500","600","700"],
+  subsets:["latin"],
+});
+
 
 export const metadata: Metadata = {
   title: "Create T3 App",
@@ -20,13 +26,12 @@ export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en" className={`${GeistSans.variable}`}>
+    <html lang="en" className={`${pacifico.className}`}>
       <body>
       <AppRouterCacheProvider  options={{ key: 'css' }}>
         <ThemeProvider theme={theme}>
             <RecoilContextProvider>
               <TRPCReactProvider>
-                <NavBar/>
                 {children}
               </TRPCReactProvider>
             </RecoilContextProvider>
