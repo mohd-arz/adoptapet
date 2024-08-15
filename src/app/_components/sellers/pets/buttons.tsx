@@ -1,6 +1,12 @@
+"use client"
 import { PencilIcon, PlusIcon, TrashIcon } from "lucide-react";
 import Link from "next/link";
 import { deletePet } from "~/lib/action";
+import { petType } from "./edit-form";
+import { Toaster } from "~/components/ui/toaster";
+import { useTransition } from "react";
+import { toast } from "~/components/ui/use-toast";
+import { ToastAction } from "~/components/ui/toast";
 
 export function AddPet() {
   return (
@@ -24,13 +30,50 @@ export function EditPet({ id }: { id: number }) {
   );
 }
 
-export function DeletePet({id,image_url,thumb_url}:{id:number,image_url:string,thumb_url:string}){
+export function DeletePet({pet}:{pet:petType}){
+  const [isPending, startTransition] = useTransition();
+  async function handleDelete(){
+    startTransition(async()=>{
+      try{
+        const res = await deletePet(pet)
+        if(res.status){
+          toast({
+            description: res.message,
+          })
+        }else{
+          if(res.error){
+            toast({
+              variant: "destructive",
+              title: "Uh oh! Something went wrong.",
+              description: res.error,
+              action: <ToastAction altText="Try again">Try again</ToastAction>,
+            })
+          }else{
+            toast({
+              title: "Uh oh! Something went wrong.",
+              description: res.message,
+            })
+          }
+        }
+      }catch(err:any){
+        toast({
+          variant: "destructive",
+          title: "Uh oh! Something went wrong.",
+          description: err.message,
+          action: <ToastAction altText="Try again">Try again</ToastAction>,
+        })
+      }
+    })
+  }
   return (
-    <form action={deletePet.bind(null,id,image_url,thumb_url)}>
+    <>
+    <form action={handleDelete}>
       <button className="rounded-md border p-2 hover:bg-gray-100">
         <span className="sr-only">Delete</span>
         <TrashIcon className="w-5" />
       </button>
     </form>
+    <Toaster/>
+    </>
   )
 }

@@ -11,6 +11,15 @@ import {  type } from '~/lib/atom';
 import { api } from '~/trpc/react';
 import { PetType } from '@prisma/client';
 import { CldImage } from 'next-cloudinary';
+import Image from 'next/image';
+import Link from 'next/link';
+import { Gloock}from '@next/font/google'
+
+const gloock = Gloock({
+  weight: ["400"],
+  subsets:["latin"],
+});
+
 export type petType= inferRouterOutputs<AppRouter>['pet']['getNewPets'];
 
 
@@ -22,67 +31,86 @@ export function SwiperContainer():JSX.Element{
   const handlePrev = () => {
     if (swiperRef.current) {
       const swiper = swiperRef.current.swiper;
-      const newIndex = Math.max(swiper.activeIndex - 3, 0);
-      swiper.slideTo(newIndex);
+      swiper.slidePrev();
     }
   };
 
   const handleNext = () => {
     if (swiperRef.current) {
       const swiper = swiperRef.current.swiper;
-      const newIndex = Math.min(swiper.activeIndex + 3, swiper.slides.length - 1);
-      swiper.slideTo(newIndex);
+      swiper.slideNext();
     }
   };
   return (
-    <div className="relative px-8">
-    <Swiper
-        spaceBetween={50}
-        slidesPerView={3}
-        loop={true}
-        onSlideChange={() => console.log('slide change')}
-        onSwiper={(swiper) => console.log(swiper)}
-        ref={swiperRef}
-      >
-        {isSuccess ? data.map((pet,index)=>(
-          <SwiperSlide key={index}><SlideElement pet={pet}/></SwiperSlide>
-        ))
-        :
-        <div className='flex gap-8'>
-        <SlideElementSkeleton/>
-        <SlideElementSkeleton/>
-        <SlideElementSkeleton/>
-        </div>
-         }
-      </Swiper>
-      <ChevronLeft
-        className="prev-arrow absolute left-0 top-2/4 cursor-pointer border border-black bg-slate-200 rounded-lg"
-        onClick={handlePrev}
-        style={{
-          color: "lightgray",
-          stroke: "black",
-          strokeWidth: "0.75",
-          fontSize: "20px",
-        }}
-      />
-      <ChevronRight
-        className="next-arrow absolute right-0 top-2/4 cursor-pointer border border-black bg-slate-200 rounded-lg"
-        onClick={handleNext}
-        style={{
-          color: "lightgray",
-          stroke: "black",
-          strokeWidth: "0.75",
-          fontSize: "20px",
-        }}
-      />
+    <div className="relative px-16">
+      {
+        (isSuccess && data.length > 0) ? (
+          <>
+          <Swiper
+            slidesPerView={3}
+            ref={swiperRef}
+            breakpoints={{
+              10: {
+                slidesPerView: 1,
+                slidesPerGroup:1,
+                spaceBetween: 20,
+              },
+              800: {
+                slidesPerView: 2,
+                slidesPerGroup:2,
+                spaceBetween: 40,
+              },
+              1024: {
+                slidesPerView: 3,
+                slidesPerGroup:3,
+                spaceBetween: 50,
+              },
+            }}
+          >
+          { data.map((pet,index)=>(
+            <SwiperSlide key={index}>
+              <Link href={`/pet/${pet.id}`} style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', textAlign: 'center' }}>
+                <SlideElement pet={pet}/>
+              </Link>
+            </SwiperSlide>
+           ))
+          }
+          </Swiper> 
+            <ChevronLeft
+              className="prev-arrow absolute left-0 top-1/2 cursor-pointer "
+              onClick={handlePrev}
+              size={45}
+              style={{
+                strokeWidth: "1",
+              }}
+            />
+            <ChevronRight
+              className="next-arrow absolute right-0 top-1/2 cursor-pointer"
+              onClick={handleNext}
+              size={45}
+              style={{
+                strokeWidth: "1",
+              }}
+            />
+          </>
+          )
+          : (
+          <div className='flex gap-8'>
+            <SlideElementSkeleton/>
+            <SlideElementSkeleton/>
+            <SlideElementSkeleton/>
+        </div> )
+      }
+   
+    
     </div>
   )
 }
 
 function SlideElement({pet}:{pet:any}):JSX.Element{
   const maskStyle= {
-      WebkitMaskImage: 'url("https://prod-assets.production.omega.aapdev.org/img/Mask-pet-card-wavy.svg")',
-      maskImage: 'url("https://prod-assets.production.omega.aapdev.org/img/Mask-pet-card-wavy.svg")',
+      WebkitMaskImage: 'url("assets/Mask-pet-card-wavy.svg")',
+      maskImage: 'url("assets/Mask-pet-card-wavy.svg")',
       WebkitMaskRepeat: "no-repeat",
       maskRepeat: "no-repeat",
       maskSize:'85%',    
@@ -92,19 +120,15 @@ function SlideElement({pet}:{pet:any}):JSX.Element{
     const BASE_URL = process.env.NEXTAUTH_URL ??  "http://localhost:3000";
   return (
     <div style={{ maxWidth:'350px' }} className="flex flex-col w-full max-h-500 bg-cyan rounded-2xl">
-        <div className="w-full" style={maskStyle}>
-          {/* <img src="https://pet-uploads.adoptapet.com/1/b/b/1138469363.jpg" className="w-full" style={{objectFit:'cover'}} alt="Dog Image"/> */}
-           {/* <img
-              src={`${BASE_URL}/${pet.image_url}`}
-              style={{objectFit:'cover',aspectRatio:'1/1'}}
-              width={'350'}
-              alt={`${pet.name}'s profile pictures`}
-            /> */}
+        <div className={`w-full`} style={{
+          ...maskStyle, 
+          // backgroundColor:'grey'
+        }}>
             <CldImage src={pet.image_url} width={350} height={350} style={{objectFit:'cover',aspectRatio:'1/1'}}  quality={'auto'}format='auto'gravity='auto' crop={'fill'} alt={`${pet.name}'s profile pictures`}/>
         </div>
       <div className="text-left mx-4 mb-4">
         <div className="border border-black">
-          <h1 className="text-4xl truncate">{pet.name}</h1> 
+          <h1 className={`text-4xl truncate ${gloock.className}`}>{pet.name}</h1> 
         </div>
         {
           pet.type == 'DOG' ? (

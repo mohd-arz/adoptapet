@@ -1,9 +1,18 @@
-import { PetType } from "@prisma/client";
+import { PetAge, PetSex, PetType } from "@prisma/client";
 import { createTRPCRouter, protectedProcedure, publicProcedure } from "~/server/api/trpc";
 import {z} from 'zod';
 import { db } from "~/server/db";
 
 const ITEMS_PER_PAGE = 10;
+
+type PetSearchConditions = {
+  type?: PetType;
+  location_id?: number;
+  age?: {in:PetAge[]};
+  breed_id?: {in:number[]};
+  other?: string;
+  sex?:{in:PetSex[]};
+};
 
 function conditions(query:string){
   let status = null;
@@ -64,10 +73,10 @@ export const petRouter = createTRPCRouter({
       console.log(error);
     }
   }),
-  getPet:protectedProcedure
+  getPet:publicProcedure
   .input(z.object({id:z.string()}))
   .query(async({input})=>{
-    const pet = await db.pet.findUnique({where:{id:+input.id}});
+    const pet = await db.pet.findUnique({where:{id:+input.id},include:{SubImages:true,location:true,breed:true}});
     return {pet};
   }),//Count for Pet Table
   getPetTablePages:protectedProcedure
@@ -101,7 +110,9 @@ export const petRouter = createTRPCRouter({
         OR:conditions(query)
       },orderBy:{
         createdAt:'desc'
-      },
+      },include:{
+        SubImages:true,
+      }
     })
   }),
   getNewPets:publicProcedure
@@ -128,6 +139,52 @@ export const petRouter = createTRPCRouter({
         createdAt:'desc'
       }
     })
+  }),
+  getPetsBySearch:publicProcedure
+  .input(z.object({
+    location:z.string().optional(),
+    age:z.string().optional(),
+    breed:z.string().optional(),
+    other:z.string().optional(),
+    sex:z.string().optional(),
+    type:z.enum([PetType.CAT,PetType.DOG,PetType.OTHERS])
+  }))
+  .query(async({input})=>{
+    const {location,age,breed,other,sex,type} = input;
+
+    const conditions: PetSearchConditions = {
+      type: type as PetType,
+    };
+
+    if (location) {
+      conditions['location_id'] = +location as number;
+    }
+    if (age) {
+      conditions['age'] = {
+        in: age.split(',') as PetAge[],
+      };
+    }
+    if (breed) {
+      conditions['breed_id'] = {
+        in: breed.split(',').map(item => +item) as number[],
+      };
+    }
+    if (other) {
+      conditions['other'] = other as string;
+    }
+    if (sex) {
+      conditions['sex'] = {
+        in: sex.split(',') as PetSex[],
+      };
+    }
+
+    return await db.pet.findMany({
+      where: conditions,
+      include:{
+        breed:true,
+        location:true,
+      }
+    });
   })
 })
 

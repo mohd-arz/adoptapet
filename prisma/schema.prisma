@@ -20,39 +20,60 @@ model User {
   id        Int      @id @default(autoincrement())
   name      String
   email     String   @unique
-  password  String   @default("")
-  type      String   @default("buyer")
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  password  String   @default("")
+  type      String   @default("buyer")
   pets      Pet[]
+
   @@index([email])
 }
 
 model Pet {
-  id        Int       @id @default(autoincrement())
-  pet_id    String    @default(uuid())
-  name      String
-  image_url String
-  thumb_url String?
-  sex       PetSex?
-  age       PetAge?
-  type      PetType
-  other     String?
+  id          Int         @id @default(autoincrement())
+  pet_id      String      @default(uuid())
+  name        String
+  sex         PetSex?
+  age         PetAge?
+  type        PetType
+  breed_id    Int?
+  status      Boolean     @default(true)
+  image_url   String
+  thumb_url   String?
+  other       String?
+  fee         Int        
+  why         String 
+  story       String?
   location_id Int
-  location  Location @relation(fields: [location_id],references: [id])
-  breed_id  Int?
-  breed     Breed?     @relation(fields: [breed_id],references: [id])
-  status    Boolean   @default(true)
-  createdBy Int
-  seller    User      @relation(fields: [createdBy],references: [id])
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
+  createdBy   Int
+  breed       Breed?      @relation(fields: [breed_id], references: [id])
+  seller      User        @relation(fields: [createdBy], references: [id])
+  location    Location    @relation(fields: [location_id], references: [id])
+  SubImages   SubImages[]
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
 }
 
 model Location {
-  id Int @id @default(autoincrement())
-  name String 
-  pet Pet[]
+  id   Int    @id @default(autoincrement())
+  name String
+  pet  Pet[]
+}
+
+model Breed {
+  id        Int      @id @default(autoincrement())
+  name      String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  type      PetType
+  pets      Pet[]
+}
+
+model SubImages {
+  id      Int    @id @default(autoincrement())
+  sub_url String
+  pet_id  Int
+  Pet     Pet    @relation(fields: [pet_id], references: [id])
 }
 
 enum PetType {
@@ -70,13 +91,4 @@ enum PetAge {
 enum PetSex {
   MALE
   FEMALE
-}
-
-model Breed {
-  id        Int       @id @default(autoincrement())
-  name      String
-  type      PetType
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
-  pets      Pet[]
 }

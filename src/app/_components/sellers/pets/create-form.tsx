@@ -24,18 +24,11 @@ import { ToastAction } from "~/components/ui/toast"
 import { useRouter } from "next/navigation"
 import { z } from "zod"
 import { petFormSchema, petDefaultValues, breedType, locationType } from "~/lib/types"
+import Editor from "./text-editor"
+import { OTHERS } from "~/lib/utils"
 
 // //Create Form Schema
 export type formType = z.infer<typeof petFormSchema>
-
-const OTHERS = [
-  'Rabbits',
-  'Birds',
-  'Horses',
-  'Small Animals',
-  'Reptiles, Amphibians, and/or Fish',
-  'Farm-Type Animals',
-]
 
 
 export default function FormComponent():JSX.Element{
@@ -52,7 +45,15 @@ export default function FormComponent():JSX.Element{
   async function onSubmit(values: z.infer<typeof petFormSchema>) {
     const form = new FormData();
     for (const [key, value] of Object.entries(values)) {
-      form.append(key, value);
+      if (Array.isArray(value)) {
+        value.forEach((file,i) => {
+          if (file instanceof File) {
+            form.append(`${key}`, file);
+          }
+        });
+      }else {
+        form.append(key, value);
+      }
     }
     startTransition(async() => {
     try{
@@ -62,7 +63,6 @@ export default function FormComponent():JSX.Element{
           description: res.message,
         })
         setTimeout(()=>{
-          console.log('came inside')
           router.push('/sellers/pets');
           router.refresh();
         },1000)
@@ -140,10 +140,27 @@ export default function FormComponent():JSX.Element{
       <FormField control={formState.control} name="image_url" render={({field: { value, onChange, ...fieldProps } })=>{
         return(
           <FormItem>
-            <FormLabel>Image</FormLabel>
+            <FormLabel>Main Image</FormLabel>
             <FormControl>
               <Input type="file" id="picture" {...fieldProps}   accept="image/*"
               onChange={(e) =>onChange(e.target?.files?.[0])}>
+            </Input>
+            </FormControl>
+            <FormMessage/>
+          </FormItem>
+        )
+      }}></FormField>
+      {/* Sub Images */}
+      <FormField control={formState.control} name="sub_url" render={({field: { value, onChange, ...fieldProps } })=>{
+        return(
+          <FormItem>
+            <FormLabel>Sub Images</FormLabel>
+            <FormControl>
+              <Input type="file" id="picture" {...fieldProps}  multiple  accept="image/*"
+              onChange={(e) => {
+                const files = e.target.files ? Array.from(e.target.files) : [];
+                onChange(files);
+              }}>
             </Input>
             </FormControl>
             <FormMessage/>
@@ -301,6 +318,48 @@ export default function FormComponent():JSX.Element{
                     </FormItem>
                   )}
                 />
+                {/* Why need a new home */}
+                <FormField
+                    control={formState.control}
+                    name="why"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Why need a new home</FormLabel>
+                        <FormControl>
+                          <Input placeholder="Short explanation w/ example" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                {/* My Story */}
+                <FormField
+                  control={formState.control}
+                  name="story"
+                  render={({field: { value, onChange, ...fieldProps }})=>{
+                    return (
+                      <FormItem>
+                        <FormLabel>Story</FormLabel>
+                        <Editor content={value as string} setContent={onChange}/>
+                        <FormMessage />
+                      </FormItem>
+                    )
+                  }}
+                ></FormField>
+                {/* Adoption Fee */}
+                <FormField
+                    control={formState.control}
+                    name="fee"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Adoption Fee</FormLabel>
+                        <FormControl>
+                          <Input placeholder="Adoption Fee" {...field} type="number" />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
       <Button type="submit" disabled={isPending}>Submit</Button>
     </form>
   </Form>
