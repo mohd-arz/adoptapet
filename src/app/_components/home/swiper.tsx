@@ -30,16 +30,14 @@ export function SwiperContainer():JSX.Element{
   const handlePrev = () => {
     if (swiperRef.current) {
       const swiper = swiperRef.current.swiper;
-      const newIndex = Math.max(swiper.activeIndex - 3, 0);
-      swiper.slideTo(newIndex);
+      swiper.slidePrev();
     }
   };
 
   const handleNext = () => {
     if (swiperRef.current) {
       const swiper = swiperRef.current.swiper;
-      const newIndex = Math.min(swiper.activeIndex + 3, swiper.slides.length - 1);
-      swiper.slideTo(newIndex);
+      swiper.slideNext();
     }
   };
   return (
@@ -48,16 +46,29 @@ export function SwiperContainer():JSX.Element{
         (isSuccess && data.length > 0) ? (
           <>
           <Swiper
-            spaceBetween={50}
             slidesPerView={3}
-            loop={true}
-            onSlideChange={() => console.log('slide change')}
-            onSwiper={(swiper) => console.log(swiper)}
             ref={swiperRef}
+            breakpoints={{
+              10: {
+                slidesPerView: 1,
+                slidesPerGroup:1,
+                spaceBetween: 20,
+              },
+              800: {
+                slidesPerView: 2,
+                slidesPerGroup:2,
+                spaceBetween: 40,
+              },
+              1024: {
+                slidesPerView: 3,
+                slidesPerGroup:3,
+                spaceBetween: 50,
+              },
+            }}
           >
           { data.map((pet,index)=>(
             <SwiperSlide key={index}>
-              <Link href={`/pet/${pet.id}`}>
+              <Link href={`/pet/${pet.id}`} style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', textAlign: 'center' }}>
                 <SlideElement pet={pet}/>
               </Link>
             </SwiperSlide>
@@ -97,20 +108,20 @@ export function SwiperContainer():JSX.Element{
 
 function SlideElement({pet}:{pet:any}):JSX.Element{
   const maskStyle= {
-      WebkitMaskImage: 'url("https://prod-assets.production.omega.aapdev.org/img/Mask-pet-card-wavy.svg")',
-      maskImage: 'url("https://prod-assets.production.omega.aapdev.org/img/Mask-pet-card-wavy.svg")',
+      WebkitMaskImage: 'url("assets/Mask-pet-card-wavy.svg")',
+      maskImage: 'url("assets/Mask-pet-card-wavy.svg")',
       WebkitMaskRepeat: "no-repeat",
       maskRepeat: "no-repeat",
       maskSize:'85%',    
       WebkitMaskSize:'85%',    
       maskPosition:"center",
     }
-  const BASE_URL = process.env.NEXTAUTH_URL || "http://localhost:3000";
+  const BASE_URL = process.env.NEXT_PUBLIC_NEXTAUTH_URL || "http://localhost:3000";
   return (
     <div style={{ maxWidth:'350px' }} className="flex flex-col w-full max-h-500 bg-cyan rounded-2xl">
         <div className={`w-full`} style={{
           ...maskStyle, 
-          backgroundColor:'grey'
+          // backgroundColor:'grey'
         }}>
            <Image
               src={`${BASE_URL}/${pet.image_url}`}

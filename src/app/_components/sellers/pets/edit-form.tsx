@@ -20,15 +20,10 @@ import { updatePet } from "~/lib/action"
 import { ToastAction } from "~/components/ui/toast"
 import { Toaster } from "~/components/ui/toaster"
 import { useRouter } from "next/navigation"
+import { OTHERS } from "~/lib/utils"
+import Editor from "./text-editor"
 
-const OTHERS = [
-  'Rabbits',
-  'Birds',
-  'Horses',
-  'Small Animals',
-  'Reptiles, Amphibians, and/or Fish',
-  'Farm-Type Animals',
-]
+
 const MAX_FILE_SIZE = 3 * 1024 * 1024; 
 
 export const petFormSchema = z.object({
@@ -44,7 +39,10 @@ export const petFormSchema = z.object({
   type: z.enum([PetType.DOG,PetType.CAT,PetType.OTHERS],{message:"Type is required"}),
   other:z.string().optional(),
   breed: z.string().optional(),
-  location: z.string({message:"Location is required"})
+  location: z.string({message:"Location is required"}),
+  fee:z.string(),
+  why:z.string({message:"This Answer is required"}),
+  story:z.string().optional(),
 }).refine(data => {
   if (data.type === PetType.OTHERS) {
     return data.other && data.other.trim() !== '';
@@ -88,6 +86,9 @@ export default function FormComponent({pet}:{pet:petType}):JSX.Element{
       other:pet.other ? pet.other : '',
       breed:pet.breed_id ? pet.breed_id.toString() : undefined,
       location:pet.location_id ? pet.location_id.toString() : undefined,
+      why:pet.why,
+      story:pet.story ?? '',
+      fee:pet.fee.toString(),
     },
   })
 
@@ -398,6 +399,48 @@ export default function FormComponent({pet}:{pet:petType}):JSX.Element{
                     </FormItem>
                   )}
                 />
+                {/* Why need a new home */}
+                <FormField
+                    control={formState.control}
+                    name="why"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Why need a new home</FormLabel>
+                        <FormControl>
+                          <Input placeholder="Short explanation w/ example" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                {/* My Story */}
+                <FormField
+                  control={formState.control}
+                  name="story"
+                  render={({field: { value, onChange, ...fieldProps }})=>{
+                    return (
+                      <FormItem>
+                        <FormLabel>Story</FormLabel>
+                        <Editor content={value as string} setContent={onChange}/>
+                        <FormMessage />
+                      </FormItem>
+                    )
+                  }}
+                ></FormField>
+                {/* Adoption Fee */}
+                <FormField
+                    control={formState.control}
+                    name="fee"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Adoption Fee</FormLabel>
+                        <FormControl>
+                          <Input placeholder="Adoption Fee" {...field} type="number" />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
           <Button type="submit">Submit</Button>
         </form>
       </Form>

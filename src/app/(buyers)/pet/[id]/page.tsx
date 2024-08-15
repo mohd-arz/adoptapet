@@ -12,6 +12,7 @@ import { List, ListItem, Collapse } from '@mui/material';
 import { Button } from "~/components/ui/button"
 import DetailPageSkeleton from "~/app/_components/home/detail-page-skeleton"
 import { Gloock}from '@next/font/google'
+import DOMPurify from 'dompurify';
 
 const gloock = Gloock({
   weight: ["400"],
@@ -99,7 +100,7 @@ export default function({params}:{params:{id:string}}){
               ))}
             </div>
           </div>
-            <SideBox pet={pet}/>
+            <SideBox pet={pet as petType}/>
         </div>
         <div className="border border-black basic-info max-h-[12.425rem]">
           <h1 className="text-3xl font-semibold mb-4">My basic info</h1>
@@ -111,6 +112,12 @@ export default function({params}:{params:{id:string}}){
             </div>
           )}
 
+        {pet?.type === 'OTHERS' && (
+            <div className="flex gap-4 mb-2">
+              <div className="font-semibold">Type</div>
+              <div>{pet?.other}</div>
+            </div>
+          )}
           <div className="flex gap-4 mb-2">
             <div className="font-semibold">Age</div>
             <div>{pet?.age}</div>
@@ -124,13 +131,15 @@ export default function({params}:{params:{id:string}}){
 
         <div className="info mt-4">
           <h1 className="text-3xl font-semibold">Why I need a new home</h1>
-          <p>Human health issues (e.g. allergies, sickness)</p>
+          <p>{pet?.why}</p>
         </div> 
-        <div className="whynewhome mt-4">
+
+       { DOMPurify.sanitize(pet?.story as string).length > 0 && <div className="whynewhome mt-4">
           <h1 className="text-3xl font-semibold">My story</h1>
           <h2 className="text-xl font-semibold">Here's what the humans have to say about me:</h2>
-          <p className="mt-4">Josephine is a wonderful and loving cat. She is truly a lap cat who loves nothing better than to sit on your lap and be pet or just hang out. She also likes to play and nap and is honestly the cutest and sweetest cat I've ever met. She can be shy and meek at first, but warms up to people and they fall in love with her. I don't know how she is with other animals. She is timid, so wouldn't be the alpha in any situation. I am heartbroken to have to rehome her, but a household member has severe allergies. I want her to have a loving and stable home where she can be cared for and loved the way she deserves.</p>
+          <div className="mt-4"  dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(pet?.story as string) }}></div>
         </div>
+        }
       </div>
     </div>
   </div> 
@@ -180,7 +189,7 @@ function SideBox({pet}:{pet:petType}){
           </>
         )}
       </button>
-      <h1 className="text-xl font-bold mb-6">Adoption fee: $25</h1>
+      <h1 className="text-xl font-bold mb-6">Adoption fee: ₹{pet?.fee}</h1>
       <Button className="rounded-3xl w-full p-6 font-semibold">
         <Mail size={16} strokeWidth={2} className="mr-2 font-semibold"/>
         Mail to Seller

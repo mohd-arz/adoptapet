@@ -1,7 +1,7 @@
 export default function DetailPageSkeleton(){
   return (
-    <div className="max-w-[1400px] px-[5%] mx-auto grid grid-cols-12">
-    <div className="col-span-10 col-start-2 gap-x-1">
+    <div className="max-w-[1400px] w-[85%] px-[5%] mx-auto grid grid-cols-12">
+    <div className="col-span-10 col-start-2 gap-x-1 w-full">
       <div className="my-6 flex items-center gap-2">
         <div className="w-6 h-6 bg-gray-200 rounded-full animate-pulse"></div>
         <div className="w-20 h-4 bg-gray-200 rounded animate-pulse"></div>

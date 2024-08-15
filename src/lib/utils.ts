@@ -28,3 +28,13 @@ export const generatePagination = (currentPage: number, totalPages: number) => {
     totalPages,
   ];
 };
+
+// Other pets
+export const OTHERS = [
+  'Rabbits',
+  'Birds',
+  'Horses',
+  'Small Animals',
+  'Reptiles, Amphibians, and/or Fish',
+  'Farm-Type Animals',
+]

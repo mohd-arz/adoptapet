@@ -38,17 +38,20 @@ model Pet {
   type        PetType
   breed_id    Int?
   status      Boolean     @default(true)
-  createdBy   Int
-  createdAt   DateTime    @default(now())
-  updatedAt   DateTime    @updatedAt
   image_url   String
   thumb_url   String?
   other       String?
+  fee         Int        
+  why         String 
+  story       String?
   location_id Int
+  createdBy   Int
   breed       Breed?      @relation(fields: [breed_id], references: [id])
   seller      User        @relation(fields: [createdBy], references: [id])
   location    Location    @relation(fields: [location_id], references: [id])
   SubImages   SubImages[]
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
 }
 
 model Location {

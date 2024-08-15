@@ -61,7 +61,7 @@ export default async function(){
             </div>
           </section>
         </div>
-        <section className="py-20 mx-auto border text-center border-red-500 max-w-[1400px] min-h-[500px]">
+        <section className="py-20 px-10 mx-auto border text-center border-red-500 max-w-[1400px] min-h-[500px]">
           <div>
             <h1 className={`text-5xl ${gloock.className}`}>Check out adoption advice</h1>
             <p className="text-xl my-2">Wondering how (and why) you should adopt?</p>

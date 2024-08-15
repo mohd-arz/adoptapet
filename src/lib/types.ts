@@ -11,6 +11,9 @@ export const petDefaultValues = {
   age:undefined,
   breed:undefined,
   location:undefined,
+  why:'',
+  story:'',
+  fee:'0',
 }
 
 const MAX_FILE_SIZE = 3 * 1024 * 1024; 
@@ -31,6 +34,9 @@ export const petFormSchema = z.object({
   other:z.string().optional(),
   breed: z.string().optional(),
   location:z.string({message:'Location is required'}),
+  fee:z.string(),
+  why:z.string({message:"This Answer is required"}),
+  story:z.string().optional(),
 }).refine(data => {
   if (data.type === PetType.OTHERS) {
     return data.other && data.other.trim() !== '';

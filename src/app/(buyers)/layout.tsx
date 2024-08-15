@@ -10,12 +10,12 @@ export default function NavLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>){
   return (
-    <>
+    <div className="flex flex-col min-h-svh">
     <NavBar/>
     {children}
-    <footer className="h-[300px] bg-cyan mt-4">
+    <footer className="min-h-[300px] bg-cyan mt-4">
         <h1 className={`text-[200px] text-center ${gloock.className}`}>Best Friend</h1>
     </footer>
-    </>
+    </div>
   )
 }

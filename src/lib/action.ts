@@ -1,6 +1,5 @@
 "use server"
 import { PetAge, PetSex, PetType } from '@prisma/client';
-import {  array, z } from "zod"
 import  fs  from 'fs/promises';
 import path from "path";
 import { v4 as uuidv4 } from 'uuid';
@@ -9,10 +8,7 @@ import { db } from '~/server/db';
 import { getServerAuthSession } from './auth';
 import { formType as EditType, petType } from '~/app/_components/sellers/pets/edit-form';
 import { formType as CreateType } from '~/app/_components/sellers/pets/create-form';
-import { redirect } from 'next/navigation';
 import { revalidatePath } from 'next/cache';
-import { AppRouter } from '~/server/api/root';
-import { inferRouterOutputs } from '@trpc/server';
 
 type SubImageType = {
   sub_url:string,
@@ -30,6 +26,9 @@ export async function storePet(formData:FormData){
     sex: formData.get('sex') as PetSex,
     age: formData.get('age') as PetAge,
     location:formData.get('location') as string,
+    fee:formData.get('fee') as string,
+    why:formData.get('why') as string,
+    story:formData.get('story') as string,
   }
   const id =  (session?.user as { id?: number })?.id as number; 
   if(formData.get('other'))
@@ -68,6 +67,9 @@ export async function storePet(formData:FormData){
           location_id:+form.location,
           other:form.other,
           breed_id:breedId,
+          story:form.story,
+          why:form.why,
+          fee:+form.fee,
           createdBy:+id,
         }
       })
@@ -170,6 +172,9 @@ export async function updatePet(stringify:string,form:FormData,pet:petType){
         sex:values.sex,
         other:values.other,
         location_id: +values.location,
+        story:values.story,
+        why:values.why,
+        fee:+values.fee,
         breed_id:values.breed ? +values.breed : undefined,
       }
     })
