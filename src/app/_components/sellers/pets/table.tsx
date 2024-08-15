@@ -1,10 +1,10 @@
-import Image from "next/image";
 import { getServerAuthSession } from "~/lib/auth";
 import { db } from "~/server/db";
 import { DeletePet, EditPet } from "./buttons";
 import { PetType } from "@prisma/client";
 import { api } from "~/trpc/server";
 import { petType } from "./edit-form";
+import CloudImage from "./cloudinary-img";
 
 const ITEMS_PER_PAGE = 10;
 

@@ -37,6 +37,7 @@ export default async function(){
                   height={475} 
                   quality={100} 
                 />
+
               </div>
 
             <div className="text-left w-1/2 py-24">

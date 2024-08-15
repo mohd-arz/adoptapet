@@ -14,6 +14,7 @@ import { UploadApiResponse } from 'cloudinary';
 
 type SubImageType = {
   sub_url:string,
+  ext:string,
   pet_id:number
 }
 
@@ -86,6 +87,7 @@ export async function storePet(formData:FormData){
           // const buffer = Buffer.from(await img.arrayBuffer());
           const ext = path.extname(img.name);
           const uIntBuffer = new Uint8Array(await img.arrayBuffer());
+          const uniqueFilename = `${uuidv4()}-${Date.now()}`;
           const result:UploadApiResponse = await new Promise<UploadApiResponse>((resolve,reject)=>{
             cloudinary.uploader.upload_stream( {
               folder: 'pet_upload', 
@@ -100,7 +102,7 @@ export async function storePet(formData:FormData){
           // const filePath = path.join(absolutePath, uniqueFilename);
           // await fs.writeFile(filePath, buffer);
           // const relativePath = path.join('uploads', uniqueFilename);
-          urls.push({ sub_url: result.public_id, pet_id: pet.id });
+          urls.push({ sub_url: result.public_id,ext:ext, pet_id: pet.id });
         }
         await db.subImages.createMany({data:urls})
       }
@@ -175,7 +177,7 @@ export async function updatePet(stringify:string,form:FormData,pet:petType){
     });
     for(const img of pet.SubImages){
       // const oldFile = path.join(process.cwd(),'public',img.sub_url);
-      cloudinary.uploader.destroy(img.image_url)
+      cloudinary.uploader.destroy(img.sub_url)
       // if (await fileExists(oldFile)) {
       //   await fs.unlink(oldFile);
       // }
@@ -185,7 +187,7 @@ export async function updatePet(stringify:string,form:FormData,pet:petType){
       const uIntBuffer = new Uint8Array(await img.arrayBuffer());
       const buffer = Buffer.from(await img.arrayBuffer());
       const ext = path.extname(img.name);
-      const uniqueFilename = `${uuidv4()}-${Date.now()}${ext}`;
+      const uniqueFilename = `${uuidv4()}-${Date.now()}`;
       // const absolutePath = path.join(process.cwd(),'public','uploads');
       // const filePath = path.join(absolutePath, uniqueFilename);
       // await fs.writeFile(filePath, buffer);
@@ -200,7 +202,7 @@ export async function updatePet(stringify:string,form:FormData,pet:petType){
           if(result)resolve(result);
         }).end(uIntBuffer)
       })
-      urls.push({ sub_url: result.public_id, pet_id: pet.id });
+      urls.push({ sub_url: result.public_id,ext:ext, pet_id: pet.id });
     }
     await db.subImages.createMany({data:urls})
   }
@@ -234,7 +236,7 @@ export async function deletePet(pet:petType){
     // const oldFile = path.join(process.cwd(),'public',pet.image_url);
     // const oldFileT = path.join(process.cwd(),'public',pet.thumb_url as string);
     for(const img of pet.SubImages){
-      cloudinary.uploader.destroy(img.image_url)
+      cloudinary.uploader.destroy(img.sub_url)
     }
     // if (await fileExists(oldFile)) {
     //   await fs.unlink(oldFile);

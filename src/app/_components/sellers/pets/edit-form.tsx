@@ -221,14 +221,8 @@ export default function FormComponent({pet}:{pet:petType}):JSX.Element{
           {
             pet.SubImages && pet.SubImages.map(img=>
               <Suspense key={img.id} fallback={<div>Loading</div>}>
-                  <Link href={`${BASE_URL}/${img.sub_url}`} key={img.id} target="_blank">
-                    <Image
-                      src={`${BASE_URL}/${img.sub_url}`}
-                      width={100}
-                      height={100}
-                      alt={`${pet.name}'s sub picture`}
-                      className="border border-blue-300 rounded-xl"
-                    />
+                  <Link href={getSecureUrl(img.sub_url,img.ext as string)} passHref>
+                    <CloudImage src={img.sub_url} class_="border border-blue-300 rounded-xl" width={100} height={100} alt={`${pet.name} image`}/>
                   </Link>
               </Suspense>
             )

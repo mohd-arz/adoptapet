@@ -2,6 +2,7 @@ import Image from "next/image";
 import { api } from "~/trpc/server";
 import { Gloock}from '@next/font/google'
 import Link from "next/link";
+import { getSecureUrl } from "~/lib/utils";
 
 const gloock = Gloock({
   weight: ["400"],
@@ -29,7 +30,7 @@ function GridItem({pet}:{pet:any}){
     <Link href={`/pet/${pet.id}`}>
     <div className="w-full">
       <Image
-        src={`${BASE_URL}/${pet?.image_url}`}
+        src={`${getSecureUrl(pet?.image_url as string,pet?.thumb_url)}`}
         alt={`${pet?.name}'s profile picture`}
         width={420}
         height={420}

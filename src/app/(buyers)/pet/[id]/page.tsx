@@ -13,6 +13,8 @@ import { Button } from "~/components/ui/button"
 import DetailPageSkeleton from "~/app/_components/home/detail-page-skeleton"
 import { Gloock}from '@next/font/google'
 import DOMPurify from 'dompurify';
+import { CldImage } from "next-cloudinary"
+import { getSecureUrl } from "~/lib/utils"
 
 const gloock = Gloock({
   weight: ["400"],
@@ -37,6 +39,8 @@ export default function({params}:{params:{id:string}}){
       const now = new Date();
       const monthsAgo = differenceInMonths(now, data.pet.createdAt);
       setDate(Math.abs(monthsAgo));
+      console.log(getSecureUrl(data?.pet?.image_url as string,data.pet?.thumb_url as string));
+      console.log(data?.pet);
     }
   },[isSuccess,data])
   const router = useRouter();
@@ -47,7 +51,7 @@ export default function({params}:{params:{id:string}}){
     );
   }
   
-  if(isSuccess)
+  if(isSuccess && data)
   return (
     <div className="max-w-[1400px] px-[5%] mx-auto grid grid-cols-12">
     <div className="col-span-10 col-start-2 gap-x-1">
@@ -63,21 +67,35 @@ export default function({params}:{params:{id:string}}){
         <div className="grid grid-cols-10 gap-x-8">
           <div className="border border-black w-full flex flex-col gap-4 col-span-6">
             <div className="relative h-[400px] bg-slate-800">
-              <Image
-                src={imgInd === -1 ? `${BASE_URL}/${pet?.image_url}` : `${BASE_URL}/${pet?.SubImages[imgInd]?.sub_url}`}
-                layout="fill"
-                objectFit="contain"
+            <Image
+                src={imgInd === -1 ? getSecureUrl(pet?.image_url as string, pet?.thumb_url as string) : getSecureUrl(pet?.SubImages[imgInd]?.sub_url as string, pet?.SubImages[imgInd]?.ext as string)}
+                fill // Replaces layout="fill"
+                style={{ objectFit: 'contain' }} // Replaces objectFit="contain"
                 alt={`${pet?.name}'s profile pictures`}
+                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
               />
+              {/* <CldImage 
+                src={imgInd === -1 ? `${pet?.image_url}` : `${pet?.SubImages[imgInd]?.sub_url}`}
+                width={350} 
+                height={350} 
+                style={{objectFit:'contain',aspectRatio:'1/1'}}  
+                quality={'auto'}
+                format='auto'
+                gravity='auto'
+                crop={'fill'} 
+                alt={`${pet?.name}'s profile pictures`}
+              /> */}
             </div>
             <div className="grid grid-cols-5 gap-4 relative w-full">
-              <Image
-                src={`${BASE_URL}/${pet?.thumb_url}`}
+              <CldImage
+                src={`${pet?.image_url}`}
                 onClick={() => handleClick(-1)}
                 className={imgInd === -1 ? 'opacity-50' : ''}
                 alt="main image"
                 width={100}
                 height={100}
+                quality={50}
+                sizes=""
                 style={{
                   aspectRatio: '1/1',
                   objectFit: 'cover'
@@ -86,7 +104,7 @@ export default function({params}:{params:{id:string}}){
               {pet?.SubImages && pet.SubImages.map((img, ind) => (
                 <Image
                   key={ind}
-                  src={`${BASE_URL}/${img.sub_url}`}
+                  src={`${getSecureUrl(img.sub_url)}`}
                   onClick={() => handleClick(ind)}
                   className={imgInd === ind ? 'opacity-50' : ''}
                   alt="sub images"

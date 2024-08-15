@@ -29,9 +29,13 @@ export const generatePagination = (currentPage: number, totalPages: number) => {
   ];
 };
 
-export const getSecureUrl = (publicId: string, format: string = 'jpg') => {
-  const cloudName = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME; // Ensure this is set in your environment variables
-  return `https://res.cloudinary.com/${cloudName}/image/upload/${publicId}${format}`;
+export const getSecureUrl = (publicId: string, format: string = '.webp') => {
+  const cloudName = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME; 
+  let format_ = format;
+  if(format=='.jpeg'){
+    format_ = '.jpg'
+  }
+  return `https://res.cloudinary.com/${cloudName}/image/upload/${publicId}${format_}`;
 };
 // Other pets
 export const OTHERS = [
