@@ -72,6 +72,7 @@ model Breed {
 model SubImages {
   id      Int    @id @default(autoincrement())
   sub_url String
+  ext     String?
   pet_id  Int
   Pet     Pet    @relation(fields: [pet_id], references: [id])
 }
