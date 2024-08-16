@@ -9,6 +9,7 @@ import { ThemeProvider } from '@mui/material/styles';
 import theme from "~/app/_components/utils/theme";
 import RecoilContextProvider from "./_components/recoil-context-provider";
 import { Work_Sans } from "@next/font/google";
+import NextNProgressClient from "./_components/progress-bar";
 
 const pacifico = Work_Sans({
   weight: ["300","400","500","600","700"],
@@ -33,6 +34,7 @@ export default function RootLayout({
             <RecoilContextProvider>
               <TRPCReactProvider>
                 {children}
+                <NextNProgressClient/>
               </TRPCReactProvider>
             </RecoilContextProvider>
           <PrelineScript/>
