@@ -20,14 +20,14 @@ export default function () {
         name,
         email,
         password,
-        type: "seller",
+        type: "buyer",
         redirect: false,
       });
       console.log(res);
       if (res?.error) {
         setError(res.error);
       } else {
-        router.replace("/sellers/");
+        router.replace("/");
       }
     }
   }
@@ -126,8 +126,14 @@ export default function () {
               </button>
               <p className="text-sm font-light text-gray-500 dark:text-gray-400">
                 Already have an{" "}
-                <Link href={"/sellers/signin"} className="underline">
+                <Link href={"/signin"} className="underline">
                   Account?
+                </Link>
+              </p>
+              <p className="text-sm font-light text-gray-500 dark:text-gray-400">
+                Do you want to Signup as a{" "}
+                <Link href={"/sellers/signup"} className="underline">
+                  Seller?
                 </Link>
               </p>
             </form>

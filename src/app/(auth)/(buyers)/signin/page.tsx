@@ -1,38 +1,40 @@
 "use client";
-import { signIn } from "next-auth/react";
-import Link from "next/link";
+import { FormEvent, useState } from "react";
+import { signIn, useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
-import { FormEvent, useRef, useState } from "react";
+import { Toaster } from "~/components/ui/toaster";
+import { useToast } from "~/components/ui/use-toast";
+import Link from "next/link";
+import { getServerAuthSession } from "~/lib/auth";
 
-export default function () {
-  const formRef = useRef(null);
+export default function SignIn() {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const router = useRouter();
-  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-    const form = formRef.current;
-    if (form) {
-      const formData = new FormData(form);
-      const name = formData.get("name");
-      const email = formData.get("email");
-      const password = formData.get("password");
-      const res = await signIn("signup", {
-        name,
-        email,
-        password,
-        type: "seller",
-        redirect: false,
-      });
-      console.log(res);
-      if (res?.error) {
-        setError(res.error);
-      } else {
-        router.replace("/sellers/");
-      }
+  const { toast } = useToast();
+
+  async function handleSubmit(e: FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    const res: any = await signIn("login", {
+      email,
+      password,
+      type: "buyer",
+      redirect: false,
+    });
+    console.log(res);
+    if (res.error) {
+      setError(res.error);
+    } else {
+      toast({ description: "Login Successfully." });
+
+      setTimeout(() => {
+        router.back();
+      }, 1000);
     }
   }
   return (
-    <section className="bg-gray-300 dark:bg-gray-900">
+    <section className="bg-gray-300">
       <div className="mx-auto flex flex-col items-center justify-center px-6 py-8 md:h-screen lg:py-0">
         <a
           href="#"
@@ -48,29 +50,9 @@ export default function () {
         <div className="w-full rounded-lg bg-white shadow dark:border dark:border-gray-700 dark:bg-gray-800 sm:max-w-md md:mt-0 xl:p-0">
           <div className="space-y-4 p-6 sm:p-8 md:space-y-6">
             <h1 className="text-xl font-bold leading-tight tracking-tight text-gray-900 dark:text-white md:text-2xl">
-              Create an account
+              Login
             </h1>
-            <form
-              className="space-y-4 md:space-y-6"
-              onSubmit={handleSubmit}
-              ref={formRef}
-            >
-              <div>
-                <label
-                  htmlFor="name"
-                  className="mb-2 block text-sm font-medium text-gray-900 dark:text-white"
-                >
-                  Name
-                </label>
-                <input
-                  type="name"
-                  name="name"
-                  id="name"
-                  className="focus:ring-primary-600 focus:border-primary-600 block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 dark:focus:border-blue-500 dark:focus:ring-blue-500"
-                  placeholder="John Doe"
-                  required
-                />
-              </div>
+            <form className="space-y-4 md:space-y-6" onSubmit={handleSubmit}>
               <div>
                 <label
                   htmlFor="email"
@@ -80,6 +62,8 @@ export default function () {
                 </label>
                 <input
                   type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.currentTarget.value)}
                   name="email"
                   id="email"
                   className="focus:ring-primary-600 focus:border-primary-600 block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 dark:focus:border-blue-500 dark:focus:ring-blue-500"
@@ -96,6 +80,8 @@ export default function () {
                 </label>
                 <input
                   type="password"
+                  value={password}
+                  onChange={(e) => setPassword(e.currentTarget.value)}
                   name="password"
                   id="password"
                   placeholder="••••••••"
@@ -103,37 +89,24 @@ export default function () {
                   required
                 />
               </div>
-              <div>
-                <label
-                  htmlFor="confirm-password"
-                  className="mb-2 block text-sm font-medium text-gray-900 dark:text-white"
-                >
-                  Confirm password
-                </label>
-                <input
-                  type="confirm-password"
-                  name="confirm-password"
-                  id="confirm-password"
-                  placeholder="••••••••"
-                  className="focus:ring-primary-600 focus:border-primary-600 block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 dark:focus:border-blue-500 dark:focus:ring-blue-500"
-                />
-              </div>
+              <span className="text-red-500">{error}</span>
               <button
                 type="submit"
                 className="hover:bg-primary-700 focus:ring-primary-300 w-full rounded-lg bg-cyan px-5 py-2.5 text-center text-sm font-medium text-black focus:outline-none focus:ring-4"
               >
-                Create an Account
+                Login
               </button>
               <p className="text-sm font-light text-gray-500 dark:text-gray-400">
-                Already have an{" "}
+                Do you want to Signin as a{" "}
                 <Link href={"/sellers/signin"} className="underline">
-                  Account?
+                  Seller?
                 </Link>
               </p>
             </form>
           </div>
         </div>
       </div>
+      <Toaster />
     </section>
   );
 }

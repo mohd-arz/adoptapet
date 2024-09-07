@@ -12,7 +12,7 @@ const ITEMS_PER_PAGE = 10;
 export default async function({query,currentPage}:{query:string,currentPage:number}){
   const session = await getServerAuthSession();
   if(!session)return;
-  const id =  (session?.user as { id?: number })?.id as number; 
+  const id =  +(session?.user.id); 
   const pets = await api.pet.getPets({id:+id,query, currentPage});
   const BASE_URL = process.env.NEXT_BASE_URL;
     return (

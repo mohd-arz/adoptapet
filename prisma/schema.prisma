@@ -25,7 +25,8 @@ model User {
   password  String   @default("")
   type      String   @default("buyer")
   pets      Pet[]
-
+  seller_mails Mails[] @relation("seller")
+  buyer_mails  Mails[] @relation("buyer")
   @@index([email])
 }
 
@@ -50,6 +51,7 @@ model Pet {
   seller      User        @relation(fields: [createdBy], references: [id])
   location    Location    @relation(fields: [location_id], references: [id])
   SubImages   SubImages[]
+  mails       Mails[]
   createdAt   DateTime    @default(now())
   updatedAt   DateTime    @updatedAt
 }
@@ -75,6 +77,17 @@ model SubImages {
   ext     String?
   pet_id  Int
   Pet     Pet    @relation(fields: [pet_id], references: [id])
+}
+
+model Mails{
+  id Int @id @default(autoincrement())
+  seller_id Int
+  buyer_id Int
+  pet_id Int
+  Seller User @relation("seller",fields: [seller_id],references: [id])
+  Buyer User @relation("buyer",fields: [buyer_id],references: [id])
+  Pet Pet @relation(fields: [pet_id],references: [id])
+  createdAt   DateTime    @default(now())
 }
 
 enum PetType {

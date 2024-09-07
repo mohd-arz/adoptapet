@@ -5,6 +5,7 @@ import CloudImage from "~/app/_components/sellers/pets/cloudinary-img"
 import Pagination from "~/app/_components/sellers/pets/pagination"
 import Search from "~/app/_components/sellers/pets/search"
 import Table from "~/app/_components/sellers/pets/table"
+import { PetsTableSkeleton } from "~/app/_components/sellers/pets/table-skeleton"
 import { lusitana } from "~/app/_components/utils/font"
 import { getServerAuthSession } from "~/lib/auth"
 import { cloudinary } from "~/lib/cloudinary"
@@ -20,7 +21,7 @@ export default async function({
 }){
   const session = await getServerAuthSession();
   if(!session)redirect('/sellers/signin/')
-  const id =  (session?.user as { id?: number })?.id as number; 
+  const id =  +(session?.user.id); 
   const query = searchParams?.query || ''
   const currentPage = Number(searchParams?.page) || 1;
   const {totalPages} =  await api.pet.getPetTablePages({id:+id,query});
@@ -35,9 +36,9 @@ export default async function({
         <Search placeholder="Search Pets..." />
         <AddPet />
       </div>
-       {/* <Suspense key={query + currentPage} fallback={<InvoicesTableSkeleton />}> */}
+       <Suspense key={query + currentPage} fallback={<PetsTableSkeleton />}>
         <Table query={query} currentPage={currentPage}/>
-      {/* </Suspense> */}
+      </Suspense>
         <div className="mt-5 flex w-full justify-end">
           <Pagination totalPages={totalPages?totalPages : 1} />
         </div>

@@ -17,6 +17,7 @@ export default function SignIn(){
         const res:any = await signIn('login',{
         email,
         password,
+        type:'seller',
         redirect: false,
     })
     console.log(res);
