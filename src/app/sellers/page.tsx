@@ -4,28 +4,32 @@ import { redirect } from "next/navigation";
 import { getSellersDetails } from "~/lib/action";
 import { api } from "~/trpc/server";
 import { DataTable } from "./data-table";
-import { columns } from "./columns";
+import { MailType } from "~/lib/types";
 
-type MailType = Omit<Mails, "id" | "seller_id">;
 
-export default async function () {
+export default async function ({
+  searchParams,
+}: {
+  searchParams: { currentPage: string };
+}) {
   const session = await getServerSession();
+  let userid:number = 0;
   let auth = false;
-  let mails: MailType[] = [];
   if (session && session.user.email) {
     const user = await getSellersDetails(session?.user.email);
     if (user?.type == "seller") auth = true;
-    if (user?.id) mails = await api.pet.getMailsBySeller({ id: +user.id });
+    if (user?.id){
+      userid = user.id;
+    }
   }
   if (!auth) {
     return redirect("sellers/signin");
   }
-  console.log(mails);
   return (
     <div>
       Welcome Sellers
       <h2>Mails</h2>
-      {/* <DataTable data={mails} columns={columns} /> */}
+      <DataTable id={userid}/>
     </div>
   );
 }

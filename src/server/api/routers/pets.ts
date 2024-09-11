@@ -6,6 +6,7 @@ import {
 } from "~/server/api/trpc";
 import { z } from "zod";
 import { db } from "~/server/db";
+import { pages } from "next/dist/build/templates/app-page";
 
 const ITEMS_PER_PAGE = 10;
 
@@ -82,7 +83,7 @@ export const petRouter = createTRPCRouter({
     .input(z.object({ id: z.string() }))
     .query(async ({ input }) => {
       const pet = await db.pet.findUnique({
-        where: { id: +input.id },
+        where: { id: +input.id,status:true },
         include: { SubImages: true, location: true, breed: true },
       });
       return { pet };
@@ -135,6 +136,7 @@ export const petRouter = createTRPCRouter({
       return await db.pet.findMany({
         where: {
           type: input.type,
+          status:true,
         },
         take: 9,
         select: {
@@ -173,16 +175,77 @@ export const petRouter = createTRPCRouter({
       return isMailed;
     }),
   getMailsBySeller: protectedProcedure
-    .input(z.object({ id: z.number() }))
+    .input(
+      z.object({
+        id: z.number(),
+        currentPage: z.number(),
+        pageSize: z.number(),
+      }),
+    )
     .query(async ({ input }) => {
-      return await db.mails.findMany({
+      const { pageSize } = input;
+      const offset = input.currentPage * pageSize;
+      const totalCount = await db.mails.count({
         where: { seller_id: input.id },
-        select:{
-          buyer_id:true,
-          pet_id:true,
-          createdAt:true,
-        }
       });
+      const count = Math.ceil(totalCount / pageSize);
+      const result = await db.mails.findMany({
+        skip: offset,
+        take: pageSize,
+        where: { seller_id: input.id },
+        select: {
+          id: true,
+          buyer_id: true,
+          pet_id: true,
+          is_replied: true,
+          createdAt: true,
+          Buyer: {
+            select: {
+              id: true,
+              name: true,
+              email: true,
+            },
+          },
+          Pet: {
+            select: {
+              id: true,
+              name: true,
+              type: true,
+              status:true,
+              other:true,
+              breed: {
+                select: {
+                  id: true,
+                  name: true,
+                },
+              },
+            },
+          },
+        },
+      });
+      return { count, result };
+    }),
+  setStatusByMail: protectedProcedure
+    .input(z.object({ id: z.number(), status: z.boolean() }))
+    .mutation(async ({ input }) => {
+      const { id } = input;
+      const { status } = input;
+      try {
+        await db.mails.update({
+          where: { id },
+          data: {
+            is_replied: status,
+            Pet: {
+              update: {
+                status: !status,
+              },
+            },
+          },
+        });
+      } catch (err) {
+        return { status: false, message: "Something went wrong" };
+      }
+      return { status: true, message: "Set Status Successfully" };
     }),
   getPetsBySearch: publicProcedure
     .input(
