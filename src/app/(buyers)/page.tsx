@@ -11,7 +11,7 @@ const gloock = Gloock({
   subsets:["latin"],
 });
 
-export default async function(){
+export default function(){
   return (
     <div className="">
       <Header/>
