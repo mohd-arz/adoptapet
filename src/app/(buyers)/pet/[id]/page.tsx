@@ -228,6 +228,7 @@ function SideBox({ pet }: { pet: petType }) {
           pet.id,
           pet.createdBy as number,
           session.data.user.id as string,
+          session.data.user.email as string,
         );
         if (res.status) {
           toast({

@@ -12,6 +12,7 @@ import {
 } from "~/app/_components/sellers/pets/edit-form";
 import { formType as CreateType } from "~/app/_components/sellers/pets/create-form";
 import { revalidatePath } from "next/cache";
+import { sendMailUtils } from "./mail";
 
 type SubImageType = {
   sub_url: string;
@@ -237,6 +238,7 @@ export async function sendMail(
   pet_id: number,
   seller_id: number,
   buyer_id: string,
+  buyer_email: string,
 ) {
   try {
     await db.mails.create({
@@ -246,6 +248,14 @@ export async function sendMail(
         seller_id: seller_id,
       },
     });
+    const user = await db.user.findUniqueOrThrow({ where: { id: seller_id } });
+    await sendMailUtils(
+      "TEST",
+      buyer_email,
+      user.email,
+      "You have message from " + buyer_email,
+    );
+    console.log("user ", user);
     return { message: "Mail send Successfully", status: true };
   } catch (err: any) {
     return { message: "An error occurred", error: err.message, status: false };
