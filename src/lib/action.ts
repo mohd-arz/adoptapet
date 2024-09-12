@@ -13,7 +13,8 @@ import {
 import { formType as CreateType } from "~/app/_components/sellers/pets/create-form";
 import { revalidatePath } from "next/cache";
 import { sendMailUtils } from "./mail";
-import { UploadApiResponse } from 'cloudinary';
+import { UploadApiResponse } from 'cloudinary'
+import { cloudinary } from './cloudinary';;
 
 type SubImageType = {
   sub_url:string,
