@@ -2,14 +2,17 @@
 import { PetAge, PetSex, PetType } from "@prisma/client";
 import fs from "fs/promises";
 import path from "path";
-import { v4 as uuidv4 } from 'uuid';
-import sharp from "sharp"
-import { db } from '~/server/db';
-import { getServerAuthSession } from './auth';
-import { formType as EditType, petType } from '~/app/_components/sellers/pets/edit-form';
-import { formType as CreateType } from '~/app/_components/sellers/pets/create-form';
-import { revalidatePath } from 'next/cache';
-import { cloudinary } from './cloudinary';
+import { v4 as uuidv4 } from "uuid";
+import sharp from "sharp";
+import { db } from "~/server/db";
+import { getServerAuthSession } from "./auth";
+import {
+  formType as EditType,
+  petType,
+} from "~/app/_components/sellers/pets/edit-form";
+import { formType as CreateType } from "~/app/_components/sellers/pets/create-form";
+import { revalidatePath } from "next/cache";
+import { sendMailUtils } from "./mail";
 import { UploadApiResponse } from 'cloudinary';
 
 type SubImageType = {
@@ -269,6 +272,7 @@ export async function sendMail(
   pet_id: number,
   seller_id: number,
   buyer_id: string,
+  buyer_email: string,
 ) {
   try {
     await db.mails.create({
@@ -278,6 +282,14 @@ export async function sendMail(
         seller_id: seller_id,
       },
     });
+    const user = await db.user.findUniqueOrThrow({ where: { id: seller_id } });
+    await sendMailUtils(
+      "TEST",
+      buyer_email,
+      user.email,
+      "You have message from " + buyer_email,
+    );
+    console.log("user ", user);
     return { message: "Mail send Successfully", status: true };
   } catch (err: any) {
     return { message: "An error occurred", error: err.message, status: false };

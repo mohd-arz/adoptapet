@@ -92,3 +92,28 @@ declare module "next-auth" {
     } & DefaultSession["user"];
   }
 }
+
+export type MailType = {
+  id:number,
+  buyer_id: number;
+  pet_id: number;
+  is_replied:boolean,
+  createdAt: Date;
+  Buyer: {
+    id: number;
+    name: string;
+    email:string;
+  };
+  Pet: {
+    id: number;
+    name: string;
+    type: PetType;
+    other:string | null,
+    status:boolean,
+    breed: {
+      id: number;
+      name: string;
+    }|null;
+  };
+};
+

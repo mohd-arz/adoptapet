@@ -84,6 +84,7 @@ model Mails{
   seller_id Int
   buyer_id Int
   pet_id Int
+  is_replied Boolean @default(false)
   Seller User @relation("seller",fields: [seller_id],references: [id])
   Buyer User @relation("buyer",fields: [buyer_id],references: [id])
   Pet Pet @relation(fields: [pet_id],references: [id])
