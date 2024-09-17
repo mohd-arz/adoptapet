@@ -103,7 +103,7 @@ function GridItem({ pet }: { pet: any }) {
     </div>
   );
 }
-export function GridItemSkeleton(): JSX.Element {
+function GridItemSkeleton(): JSX.Element {
   return (
     <div
       role="status"
