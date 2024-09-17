@@ -12,6 +12,7 @@ const ITEMS_PER_PAGE = 10;
 
 type PetSearchConditions = {
   type?: PetType;
+  status:boolean,
   location_id?: number;
   age?: { in: PetAge[] };
   breed_id?: { in: number[] };
@@ -263,6 +264,7 @@ export const petRouter = createTRPCRouter({
 
       const conditions: PetSearchConditions = {
         type: type as PetType,
+        status:true,
       };
 
       if (location) {

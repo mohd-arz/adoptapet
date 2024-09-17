@@ -70,7 +70,7 @@ export function SwiperContainer():JSX.Element{
           { data.map((pet,index)=>(
             <SwiperSlide key={index}>
               <Link href={`/pet/${pet.id}`} style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', textAlign: 'center' }}>
-                <SlideElement pet={pet}/>
+                <SlideElement pet={pet} ind={index}/>
               </Link>
             </SwiperSlide>
            ))
@@ -107,7 +107,7 @@ export function SwiperContainer():JSX.Element{
   )
 }
 
-function SlideElement({pet}:{pet:any}):JSX.Element{
+function SlideElement({pet,ind}:{pet:any,ind:number}):JSX.Element{
   const maskStyle= {
       WebkitMaskImage: 'url("assets/Mask-pet-card-wavy.svg")',
       maskImage: 'url("assets/Mask-pet-card-wavy.svg")',
@@ -119,7 +119,7 @@ function SlideElement({pet}:{pet:any}):JSX.Element{
     }
     const BASE_URL = process.env.NEXTAUTH_URL ??  "http://localhost:3000";
   return (
-    <div style={{ maxWidth:'350px' }} className="flex flex-col w-full max-h-500 bg-cyan rounded-2xl">
+    <div style={{ maxWidth:'350px' }} className={`flex flex-col w-full max-h-500 ${ind==0 ? 'bg-cyan' : ind == 1 ? 'bg-t-blue' : 'bg-mustard-yello'} rounded-2xl`}>
         <div className={`w-full`} style={{
           ...maskStyle, 
           // backgroundColor:'grey'
@@ -150,7 +150,7 @@ function SlideElement({pet}:{pet:any}):JSX.Element{
   )
 }
 
-function SlideElementSkeleton(): JSX.Element {
+export function SlideElementSkeleton(): JSX.Element {
   return (
     <div
       role="status"

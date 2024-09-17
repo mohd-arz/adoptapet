@@ -2,7 +2,6 @@ import nodemailer from "nodemailer";
 
 export async function sendMailUtils(
   subject: string,
-  fromEmail: string,
   toEmail: string,
   txt: string,
 ) {

@@ -269,8 +269,10 @@ export async function deletePet(pet:petType){
     return { message: "An error occured", error: err.message, status: false };
   }
 }
-export async function sendMail(
+export async function sendMailToSeller(
   pet_id: number,
+  pet_name:string,
+  pet_type:PetType,
   seller_id: number,
   buyer_id: string,
   buyer_email: string,
@@ -285,17 +287,37 @@ export async function sendMail(
     });
     const user = await db.user.findUniqueOrThrow({ where: { id: seller_id } });
     await sendMailUtils(
-      "TEST",
-      buyer_email,
+      "Your Pet is Requested",
       user.email,
-      "You have message from " + buyer_email,
+      "Your "+pet_name+" ("+pet_type+") is requested by " + buyer_email,
     );
-    console.log("user ", user);
     return { message: "Mail send Successfully", status: true };
   } catch (err: any) {
     return { message: "An error occurred", error: err.message, status: false };
   }
 }
+export async function sendMailToBuyer(pet_id:number,pet_name:string,pet_type:PetType,buyer_id:number,seller_id:string)
+  {
+    try {
+      // await db.mails.create({
+      //   data: {
+      //     pet_id: pet_id,
+      //     buyer_id: +buyer_id,
+      //     seller_id: seller_id,
+      //   },
+      // });
+      const user = await db.user.findUniqueOrThrow({ where: { id: buyer_id } });
+      await sendMailUtils(
+        "Woohoo! Seller assigned you the pet",
+        user.email,
+        "Your requested  "+pet_name+" ("+pet_type+") is assigned by the seller, The seller will contact you for upcoming process",
+      );
+      return { message: "Mail send Successfully", status: true };
+    } catch (err: any) {
+      return { message: "An error occurred", error: err.message, status: false };
+    }
+}
+
 
 export async function fileExists(filePath: string): Promise<boolean> {
   try {

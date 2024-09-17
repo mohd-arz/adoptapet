@@ -17,7 +17,7 @@ const links = [
     href: '/sellers/pets',
     icon: MdOutlinePets,
   },
-  { name: 'Category', href: '/dashboard/category', icon: TbCategoryMinus },
+  // { name: 'Category', href: '/dashboard/category', icon: TbCategoryMinus },
 ];
 
 export default function NavLinks() {

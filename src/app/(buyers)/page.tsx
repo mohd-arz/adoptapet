@@ -16,7 +16,7 @@ export default function(){
     <div className="">
       <Header/>
       <main>
-        <section className="px-[5%] my-10 mx-auto border text-center border-red-500 max-w-[1400px]">
+        <section className="px-[5%] my-10 mx-auto  text-center  max-w-[1400px]">
           <div>
             <h1 className={`text-5xl ${gloock.className}`}>
               Meet featured pets
@@ -28,7 +28,7 @@ export default function(){
           <SwiperContainer/>
         </section>
         <div className="wrapper bg-cyan">
-          <section className="px-[5%] mx-auto border text-center border-red-500 max-w-[1400px] w-full flex gap-14 ">
+          <section className="px-[5%] mx-auto  max-w-[1400px] w-full flex gap-14 ">
           <div className="w-1/2 py-20">
                 <Image
                   src="/assets/HP-GettoKnowUs.png"
@@ -62,7 +62,7 @@ export default function(){
             </div>
           </section>
         </div>
-        <section className="py-20 px-10 mx-auto border text-center border-red-500 max-w-[1400px] min-h-[500px]">
+        <section className="py-20 px-10 mx-auto  text-center  max-w-[1400px] min-h-[500px]">
           <div>
             <h1 className={`text-5xl ${gloock.className}`}>Check out adoption advice</h1>
             <p className="text-xl my-2">Wondering how (and why) you should adopt?</p>
