@@ -18,6 +18,7 @@ import { motion } from "framer-motion";
 import { Gloock } from "@next/font/google";
 import { useRouter } from "next/navigation";
 import { signOut, useSession } from "next-auth/react";
+import { url } from "inspector";
 
 const gloock = Gloock({
   weight: ["400"],
@@ -26,10 +27,10 @@ const gloock = Gloock({
 
 export function Header() {
   return (
-    <header className="border">
+    <header className="">
       <Banner />
       <div className="empty-cyan h-10 bg-cyan"></div>
-      <div className="empty-blue bg-blue h-16"></div>
+      <div className="empty-blue bg-t-blue h-16"></div>
     </header>
   );
 }
@@ -40,7 +41,7 @@ export function NavBar(): JSX.Element {
 
   return (
     <div className="wrapper bg-cyan">
-      <nav className="mx-auto flex h-[88px] max-w-[1400px] flex-row items-center justify-between border border-red-500 px-[5%]">
+      <nav className="mx-auto flex h-[88px] max-w-[1400px] flex-row items-center justify-between px-[5%]">
         <div className={`${gloock.className} text-2xl italic`}>Best Friend</div>
         <div className="h-full">
           <NavDropdown />
@@ -145,10 +146,27 @@ function Banner(): JSX.Element {
 
     router.push(`/search?${queryParams.toString()}`);
   }
+  let image;
+  if (type == "DOG") {
+    image = "/assets/Hero-DogSearch-desktop.avif";
+  } else if (type == "CAT") {
+    image = "/assets/Hero-CatSearch-desktop.avif";
+  } else {
+    image = "/assets/Hero-OtherPetsSearch-desktop.avif";
+  }
 
   return (
-    <div className="wrapper bg-dark-cyan">
-      <div className="banner-container mx-auto flex h-[800px] max-w-[1400px] items-end border border-purple-700 px-[5%]">
+    <div
+      className="wrapper relative z-0 bg-dark-cyan"
+      style={{
+        backgroundImage: `url(${image})`,
+        backgroundPosition: "center",
+        backgroundSize: "cover",
+        transition: "background-image 0.5s ease-in-out",
+      }}
+    >
+      <div className="absolute inset-0 z-[-1] bg-black opacity-30"></div>
+      <div className="banner-container mx-auto flex h-[800px] max-w-[1400px] items-end px-[5%]">
         <div className="banner-content w-full">
           <motion.div
             className={`banner-title text-9xl text-white ${gloock.className}`}

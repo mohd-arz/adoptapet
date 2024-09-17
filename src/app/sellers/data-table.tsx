@@ -54,7 +54,7 @@ export function DataTable<TData, TValue>({ id }: { id: number }) {
             is_replied: checked,
             Pet: { ...row.Pet, status: !checked },
           };
-        } else if (row.buyer_id === buyer_id) {
+        } else if (row.pet_id === pet_id) {
           return { ...row, Pet: { ...row.Pet, status: !checked } };
         } else {
           return row;

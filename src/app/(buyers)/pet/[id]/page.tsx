@@ -23,8 +23,9 @@ import { useSession } from "next-auth/react";
 import { db } from "~/server/db";
 import { toast } from "~/components/ui/use-toast";
 import { Toaster } from "~/components/ui/toaster";
-import { sendMail } from "~/lib/action";
+import { sendMailToSeller } from "~/lib/action";
 import { ToastAction } from "~/components/ui/toast";
+import { PetType } from "@prisma/client";
 
 const gloock = Gloock({
   weight: ["400"],
@@ -224,8 +225,10 @@ function SideBox({ pet }: { pet: petType }) {
       session.data.user.type == "buyer"
     ) {
       startTransition(async () => {
-        const res = await sendMail(
+        const res = await sendMailToSeller(
           pet.id,
+          pet.name as string,
+          pet.type as PetType,
           pet.createdBy as number,
           session.data.user.id as string,
           session.data.user.email as string,

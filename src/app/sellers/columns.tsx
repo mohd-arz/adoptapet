@@ -6,6 +6,10 @@ import { Button } from "~/components/ui/button";
 import { MailType } from "~/lib/types";
 import { Switch } from "~/components/ui/switch";
 import { api } from "~/trpc/react";
+import { useTransition } from "react";
+import { sendMailToBuyer } from "~/lib/action";
+import { PetType } from "@prisma/client";
+import { useSession } from "next-auth/react";
 
 function SwitchFn({
   rowData,
@@ -14,6 +18,8 @@ function SwitchFn({
   id,
   buyer_id,
   pet_status,
+  pet_name,
+  pet_type,
   onSwitchChange,
 }: {
   rowData: any;
@@ -22,18 +28,46 @@ function SwitchFn({
   id: number;
   buyer_id: number;
   pet_status: boolean;
+  pet_name: string;
+  pet_type: PetType;
   onSwitchChange: (checked: boolean, pet_id: number, buyer_id: number) => void;
 }) {
+  const [isPending, startTransition] = useTransition();
+  const session = useSession();
+
   const mutation = api.pet.setStatusByMail.useMutation();
   function onChange(checked: boolean, id: number) {
-    onSwitchChange(checked, pet_id, buyer_id);
-    mutation.mutate({ id: id, status: checked });
+    mutation.mutate(
+      { id: id, status: checked },
+      {
+        onSuccess: () => {
+          console.log('on success')
+          onSwitchChange(checked, pet_id, buyer_id);
+          startTransition(async () => {
+            console.log('hello',session)
+            const seller_id = session.data?.user.id;
+            const result = await sendMailToBuyer(
+              pet_id,
+              pet_name,
+              pet_type,
+              buyer_id,
+              seller_id as string,
+            );
+            console.log("result ", result);
+          });
+        },
+        onError: (err) => {
+          console.error("Err while mutating", err);
+        },
+      },
+    );
   }
   return (
     <Switch
       defaultChecked={status}
       onCheckedChange={(checked) => onChange(checked, id)}
-      disabled={!status && !pet_status}
+      // disabled={!status && !pet_status}
+      disabled={!pet_status}
     />
   );
 }
@@ -94,11 +128,13 @@ export const columns = (
     },
   },
   {
-    header: "Action",
+    header: "Assign",
     accessorKey: "is_replied",
     cell: ({ row }) => {
       const id = row.original.id;
       const petStatus = row.original.Pet.status;
+      const pet_name = row.original.Pet.name;
+      const pet_type = row.original.Pet.type;
       return (
         <SwitchFn
           rowData={row.original}
@@ -107,6 +143,8 @@ export const columns = (
           pet_id={row.original.pet_id}
           buyer_id={row.original.buyer_id}
           pet_status={petStatus}
+          pet_name={pet_name}
+          pet_type={pet_type}
           onSwitchChange={(checked, pet_id, buyer_id) =>
             handleSwitchChange(checked, pet_id, buyer_id)
           }
