@@ -83,7 +83,7 @@ export default function ({ params }: { params: { id: string } }) {
               Back
             </span>
           </button>
-          <div className="border border-black">
+          <div className="border-black">
             <h1 className={`my-4 text-5xl ${gloock.className}`}>
               My Name is {pet?.name} !
             </h1>
@@ -94,7 +94,7 @@ export default function ({ params }: { params: { id: string } }) {
                 : `${date} month${(date as number) > 1 ? "s" : ""} ago`}
             </h2>
             <div className="grid grid-cols-10 gap-x-8">
-              <div className="col-span-6 flex w-full flex-col gap-4 border border-black">
+              <div className="col-span-6 flex w-full flex-col gap-4 border-black">
                 <div className="relative h-[400px] bg-slate-800">
                   <Image
                     src={
@@ -131,9 +131,9 @@ export default function ({ params }: { params: { id: string } }) {
                   />
                   {pet?.SubImages &&
                     pet.SubImages.map((img, ind) => (
-                      <Image
+                      <CldImage
                         key={ind}
-                        src={`${getSecureUrl(img.sub_url)}`}
+                        src={`${img.sub_url}`}
                         onClick={() => handleClick(ind)}
                         className={imgInd === ind ? "opacity-50" : ""}
                         alt="sub images"
@@ -149,7 +149,7 @@ export default function ({ params }: { params: { id: string } }) {
               </div>
               <SideBox pet={pet as petType} />
             </div>
-            <div className="basic-info max-h-[12.425rem] border border-black">
+            <div className="basic-info max-h-[12.425rem] border-black">
               <h1 className="mb-4 text-3xl font-semibold">My basic info</h1>
 
               {pet?.type === "DOG" && (

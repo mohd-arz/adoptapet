@@ -44,7 +44,7 @@ export default function ({ searchParams }: { searchParams: any }) {
       {!response.isLoading && pets.length == 0 ? (
         <div className="block text-center text-3xl">No Pets Found</div>
       ) : (
-        <div className="grid flex-1 grid-cols-12 gap-x-6">
+        <div className="grid flex-1 grid-cols-12 gap-6">
           {response.isLoading ? (
             <>
               {[1, 2, 3, 4].map((ind) => {
@@ -76,7 +76,7 @@ function GridItem({ pet }: { pet: any }) {
         />
         </div>
         <div className="mx-4 mb-4 text-left">
-          <div className="border border-black">
+          <div className="border-black">
             <h1 className={`truncate text-4xl ${gloock.className}`}>
               {pet?.name}
             </h1>

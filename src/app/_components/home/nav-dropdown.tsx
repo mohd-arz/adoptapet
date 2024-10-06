@@ -1,13 +1,16 @@
 "use client";
 
+import { useRouter } from "next/navigation";
+import { Router } from "next/router";
 import { useRecoilState, useSetRecoilState } from "recoil";
 import { type } from "~/lib/atom";
 
 export default function NavDropdown(): JSX.Element {
   const setType = useSetRecoilState(type);
+  const router = useRouter();
 
   function handleClick(index: number, ind: number) {
-    console.log("index and ind", index, ind);
+    router.push("/");
     switch (index) {
       case 0:
         switch (ind) {

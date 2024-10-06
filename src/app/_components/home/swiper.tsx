@@ -1,31 +1,30 @@
-"use client"
-import { Swiper, SwiperRef, SwiperSlide } from 'swiper/react';
-import { useSwiper } from 'swiper/react';
-import {  useRef } from "react";
-import 'swiper/css';
-import { inferRouterOutputs } from '@trpc/server';
-import { AppRouter } from '~/server/api/root';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
-import { useRecoilValue } from 'recoil';
-import {  type } from '~/lib/atom';
-import { api } from '~/trpc/react';
-import { PetType } from '@prisma/client';
-import { CldImage } from 'next-cloudinary';
-import Image from 'next/image';
-import Link from 'next/link';
-import { Gloock}from '@next/font/google'
+"use client";
+import { Swiper, SwiperRef, SwiperSlide } from "swiper/react";
+import { useSwiper } from "swiper/react";
+import { useRef } from "react";
+import "swiper/css";
+import { inferRouterOutputs } from "@trpc/server";
+import { AppRouter } from "~/server/api/root";
+import { ChevronLeft, ChevronRight } from "lucide-react";
+import { useRecoilValue } from "recoil";
+import { type } from "~/lib/atom";
+import { api } from "~/trpc/react";
+import { PetType } from "@prisma/client";
+import { CldImage } from "next-cloudinary";
+import Image from "next/image";
+import Link from "next/link";
+import { Gloock } from "@next/font/google";
 
 const gloock = Gloock({
   weight: ["400"],
-  subsets:["latin"],
+  subsets: ["latin"],
 });
 
-export type petType= inferRouterOutputs<AppRouter>['pet']['getNewPets'];
+export type petType = inferRouterOutputs<AppRouter>["pet"]["getNewPets"];
 
-
-export function SwiperContainer():JSX.Element{
-  const value = useRecoilValue(type)
-  const {data,isSuccess} = api.pet.getNewPets.useQuery({type:value});
+export function SwiperContainer(): JSX.Element {
+  const value = useRecoilValue(type);
+  const { data, isSuccess } = api.pet.getNewPets.useQuery({ type: value });
   const swiper = useSwiper();
   const swiperRef = useRef<SwiperRef>(null);
   const handlePrev = () => {
@@ -43,123 +42,146 @@ export function SwiperContainer():JSX.Element{
   };
   return (
     <div className="relative px-16">
-      {
-        (isSuccess && data.length > 0) ? (
-          <>
+      {isSuccess && data.length > 0 ? (
+        <>
           <Swiper
             slidesPerView={3}
             ref={swiperRef}
             breakpoints={{
               10: {
                 slidesPerView: 1,
-                slidesPerGroup:1,
+                slidesPerGroup: 1,
                 spaceBetween: 20,
               },
               800: {
                 slidesPerView: 2,
-                slidesPerGroup:2,
+                slidesPerGroup: 2,
                 spaceBetween: 40,
               },
               1024: {
                 slidesPerView: 3,
-                slidesPerGroup:3,
+                slidesPerGroup: 3,
                 spaceBetween: 50,
               },
             }}
           >
-          { data.map((pet,index)=>(
-            <SwiperSlide key={index}>
-              <Link href={`/pet/${pet.id}`} style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', textAlign: 'center' }}>
-                <SlideElement pet={pet} ind={index}/>
-              </Link>
-            </SwiperSlide>
-           ))
-          }
-          </Swiper> 
-            <ChevronLeft
-              className="prev-arrow absolute left-0 top-1/2 cursor-pointer "
-              onClick={handlePrev}
-              size={45}
-              style={{
-                strokeWidth: "1",
-              }}
-            />
-            <ChevronRight
-              className="next-arrow absolute right-0 top-1/2 cursor-pointer"
-              onClick={handleNext}
-              size={45}
-              style={{
-                strokeWidth: "1",
-              }}
-            />
-          </>
-          )
-          : (
-          <div className='flex gap-8'>
-            <SlideElementSkeleton/>
-            <SlideElementSkeleton/>
-            <SlideElementSkeleton/>
-        </div> )
-      }
-   
-    
+            {data.map((pet, index) => (
+              <SwiperSlide key={index}>
+                <Link
+                  href={`/pet/${pet.id}`}
+                  style={{
+                    display: "flex",
+                    justifyContent: "center",
+                    alignItems: "center",
+                    textAlign: "center",
+                  }}
+                >
+                  <SlideElement pet={pet} ind={index} />
+                </Link>
+              </SwiperSlide>
+            ))}
+          </Swiper>
+          <ChevronLeft
+            className="prev-arrow absolute left-0 top-1/2 cursor-pointer"
+            onClick={handlePrev}
+            size={45}
+            style={{
+              strokeWidth: "1",
+            }}
+          />
+          <ChevronRight
+            className="next-arrow absolute right-0 top-1/2 cursor-pointer"
+            onClick={handleNext}
+            size={45}
+            style={{
+              strokeWidth: "1",
+            }}
+          />
+        </>
+      ) : (
+        <div className="flex gap-8">
+          <SlideElementSkeleton />
+          <SlideElementSkeleton />
+          <SlideElementSkeleton />
+        </div>
+      )}
     </div>
-  )
+  );
 }
 
-function SlideElement({pet,ind}:{pet:any,ind:number}):JSX.Element{
-  const maskStyle= {
-      WebkitMaskImage: 'url("assets/Mask-pet-card-wavy.svg")',
-      maskImage: 'url("assets/Mask-pet-card-wavy.svg")',
-      WebkitMaskRepeat: "no-repeat",
-      maskRepeat: "no-repeat",
-      maskSize:'85%',    
-      WebkitMaskSize:'85%',    
-      maskPosition:"center",
-    }
-    const BASE_URL = process.env.NEXTAUTH_URL ??  "http://localhost:3000";
+function SlideElement({ pet, ind }: { pet: any; ind: number }): JSX.Element {
+  const maskStyle = {
+    WebkitMaskImage: 'url("assets/Mask-pet-card-wavy.svg")',
+    maskImage: 'url("assets/Mask-pet-card-wavy.svg")',
+    WebkitMaskRepeat: "no-repeat",
+    maskRepeat: "no-repeat",
+    maskSize: "85%",
+    WebkitMaskSize: "85%",
+    maskPosition: "center",
+  };
+  const BASE_URL = process.env.NEXTAUTH_URL ?? "http://localhost:3000";
   return (
-    <div style={{ maxWidth:'350px' }} className={`flex flex-col w-full max-h-500 ${ind==0 ? 'bg-cyan' : ind == 1 ? 'bg-t-blue' : 'bg-mustard-yello'} rounded-2xl`}>
-        <div className={`w-full`} style={{
-          ...maskStyle, 
+    <div
+      style={{ maxWidth: "350px" }}
+      className={`max-h-500 flex w-full flex-col ${(ind + 1) % 3 == 0 ? "bg-mustard-yello" : (ind  + 1 )% 2 == 0 ? "bg-t-blue" : "bg-cyan"} rounded-2xl`}
+    >
+      <div
+        className={`w-full`}
+        style={{
+          ...maskStyle,
           // backgroundColor:'grey'
-        }}>
-            <CldImage src={pet.image_url} width={350} height={350} style={{objectFit:'cover',aspectRatio:'1/1'}}  quality={'auto'}format='auto'gravity='auto' crop={'fill'} alt={`${pet.name}'s profile pictures`}/>
+        }}
+      >
+        <CldImage
+          src={pet.image_url}
+          width={350}
+          height={350}
+          style={{ objectFit: "cover", aspectRatio: "1/1" }}
+          quality={"auto"}
+          format="auto"
+          gravity="auto"
+          crop={"fill"}
+          alt={`${pet.name}'s profile pictures`}
+        />
+      </div>
+      <div className="mx-4 mb-4 text-left">
+        <div className="border-black">
+          <h1 className={`truncate text-4xl ${gloock.className}`}>
+            {pet.name}
+          </h1>
         </div>
-      <div className="text-left mx-4 mb-4">
-        <div className="border border-black">
-          <h1 className={`text-4xl truncate ${gloock.className}`}>{pet.name}</h1> 
-        </div>
-        {
-          pet.type == 'DOG' ? (
-            <div className="my-2">
-              <h2 className="text-xl font-bold">{pet.breed.name}</h2>
-            </div>
-          ):(
-            <div className="my-2">
-              <h2 className="text-xl font-bold">{pet.type == 'OTHERS' ? pet.others : pet.type}</h2>
-            </div>
-          )
-        }
+        {pet.type == "DOG" ? (
+          <div className="my-2">
+            <h2 className="text-xl font-bold">{pet.breed.name}</h2>
+          </div>
+        ) : (
+          <div className="my-2">
+            <h2 className="text-xl font-bold">
+              {pet.type == "OTHERS" ? pet.others : pet.type}
+            </h2>
+          </div>
+        )}
         <div>
           <p className="text-lg font-light">{pet.age}</p>
-          <p className="text-lg font-light">{pet.location ? pet.location.name : 'Location'}</p>
+          <p className="text-lg font-light">
+            {pet.location ? pet.location.name : "Location"}
+          </p>
         </div>
       </div>
     </div>
-  )
+  );
 }
 
 export function SlideElementSkeleton(): JSX.Element {
   return (
     <div
       role="status"
-      style={{ maxWidth: "350px",height:"508px" }}
-      className="flex flex-col w-full max-h-500 p-4 border border-gray-200 rounded-2xl shadow animate-pulse bg-white md:p-6 dark:border-gray-700"
+      style={{ maxWidth: "350px", height: "508px" }}
+      className="max-h-500 flex w-full animate-pulse flex-col rounded-2xl border border-gray-200 bg-white p-4 shadow dark:border-gray-700 md:p-6"
     >
-      <div className="flex items-center justify-center w-full h-64 mb-4 bg-gray-300 rounded dark:bg-gray-700">
+      <div className="mb-4 flex h-64 w-full items-center justify-center rounded bg-gray-300 dark:bg-gray-700">
         <svg
-          className="w-10 h-10 text-gray-200 dark:text-gray-600"
+          className="h-10 w-10 text-gray-200 dark:text-gray-600"
           aria-hidden="true"
           xmlns="http://www.w3.org/2000/svg"
           fill="currentColor"
@@ -169,12 +191,12 @@ export function SlideElementSkeleton(): JSX.Element {
           <path d="M5 5V.13a2.96 2.96 0 0 0-1.293.749L.879 3.707A2.98 2.98 0 0 0 .13 5H5Z" />
         </svg>
       </div>
-      <div className="text-left mx-4 mb-4">
-        <div className="h-8 mb-2 bg-gray-200 rounded dark:bg-gray-700"></div>
-        <div className="h-2.5 bg-gray-200 rounded-full dark:bg-gray-700 w-48 mb-4"></div>
-        <div className="h-2 bg-gray-200 rounded-full dark:bg-gray-700 w-32 mb-4"></div>
-        <div className="h-2 bg-gray-200 rounded-full dark:bg-gray-700 mb-2"></div>
-        <div className="h-2 bg-gray-200 rounded-full dark:bg-gray-700 mb-2"></div>
+      <div className="mx-4 mb-4 text-left">
+        <div className="mb-2 h-8 rounded bg-gray-200 dark:bg-gray-700"></div>
+        <div className="mb-4 h-2.5 w-48 rounded-full bg-gray-200 dark:bg-gray-700"></div>
+        <div className="mb-4 h-2 w-32 rounded-full bg-gray-200 dark:bg-gray-700"></div>
+        <div className="mb-2 h-2 rounded-full bg-gray-200 dark:bg-gray-700"></div>
+        <div className="mb-2 h-2 rounded-full bg-gray-200 dark:bg-gray-700"></div>
       </div>
     </div>
   );
