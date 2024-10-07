@@ -64,7 +64,7 @@ export default function ({ searchParams }: { searchParams: any }) {
 
 function GridItem({ pet }: { pet: any }) {
   return (
-    <div className="col-span-3 h-[420px] overflow-hidden rounded-lg border border-black">
+    <div className="col-span-3 h-[420px] overflow-hidden rounded-lg border border-gray-500">
       <Link href={`/pet/${pet.id}`}>
         <div className="w-full">
         <Image

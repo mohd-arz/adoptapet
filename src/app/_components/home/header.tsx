@@ -30,7 +30,7 @@ export function Header() {
     <header className="">
       <Banner />
       <div className="empty-cyan h-10 bg-cyan"></div>
-      <div className="empty-blue bg-t-blue h-16"></div>
+      <div className="empty-blue h-16 bg-t-blue"></div>
     </header>
   );
 }
@@ -42,7 +42,9 @@ export function NavBar(): JSX.Element {
   return (
     <div className="wrapper bg-cyan">
       <nav className="mx-auto flex h-[88px] max-w-[1400px] flex-row items-center justify-between px-[5%]">
-        <div className={`${gloock.className} text-2xl italic`}>Best Friend</div>
+        <div className={`${gloock.className} text-2xl italic`}>
+          <a href="/">Best Friend</a>
+        </div>
         <div className="h-full">
           <NavDropdown />
         </div>

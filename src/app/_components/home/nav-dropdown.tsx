@@ -11,6 +11,7 @@ export default function NavDropdown(): JSX.Element {
 
   function handleClick(index: number, ind: number) {
     router.push("/");
+    console.log(index, ind);
     switch (index) {
       case 0:
         switch (ind) {
@@ -24,12 +25,22 @@ export default function NavDropdown(): JSX.Element {
             setType("OTHERS");
             break;
         }
+      break;
+      case 1:
+        switch (ind) {
+          case 0:
+            router.push("/how-to/adopt-a-dog");
+            break;
+          case 1:
+            router.push("/how-to/adopt-a-cat");
+            break;
+        }
     }
   }
   const content = {
     "Find a Pet": ["Find a Dog", "Find a Cat", "Find other animals"],
     "How-to": ["How to adopt a dog", "How to adopt a cat"],
-    "Get Involved": ["Ways to Help"],
+    // "Get Involved": ["Ways to Help"],
   };
   return (
     <ul

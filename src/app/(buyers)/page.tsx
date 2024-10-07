@@ -5,6 +5,7 @@ import { SwiperContainer } from "../_components/home/swiper";
 import Button from "../_components/home/button";
 import Image from "next/image";
 import { Gloock}from '@next/font/google'
+import { useRouter } from "next/navigation";
 
 const gloock = Gloock({
   weight: ["400"],
@@ -12,6 +13,7 @@ const gloock = Gloock({
 });
 
 export default function(){
+  const router = useRouter();
   return (
     <div className="">
       <Header/>
@@ -52,10 +54,10 @@ export default function(){
               Ready to find your pet? Let's do it.
               </p>
               <div className="flex gap-4 items-center">
-                <Button type="black" title="How it Works" onclick={()=>{}}/>
-                <Link className="group text-black transition-all duration-300 ease-in-out" href="#" >
+                <Button type="black" title="More about Dogs" onclick={()=>{router.push('/how-to/adopt-a-dog')}}/>
+                <Link className="group text-black transition-all duration-300 ease-in-out" href="/how-to/adopt-a-cat" >
                   <span className="bg-left-bottom bg-gradient-to-r from-black to-black bg-[length:0%_2px] bg-no-repeat group-hover:bg-[length:100%_2px] transition-all duration-500 ease-out"> 
-                  More about us
+                  More about Cats
                   </span>
                  </Link>
               </div>
